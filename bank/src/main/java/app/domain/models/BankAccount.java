@@ -5,7 +5,13 @@ import java.time.LocalDate;
 
 import app.domain.enums.AccountStatus;
 import app.domain.enums.AccountType;
-import app.domain.enums.SistemRole;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
+@Getter
+@Setter
+@NoArgsConstructor
 
 public class BankAccount {
     private String accountNumber;

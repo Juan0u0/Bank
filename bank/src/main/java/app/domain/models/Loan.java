@@ -5,6 +5,13 @@ import java.time.LocalDate;
 
 import app.domain.enums.LoanStatus;
 import app.domain.enums.LoanType;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
+@Getter
+@Setter
+@NoArgsConstructor
 
 public class Loan {
     private Long loanId;

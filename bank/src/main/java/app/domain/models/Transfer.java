@@ -3,6 +3,13 @@ package app.domain.models;
 import java.time.LocalDate;
 
 import app.domain.enums.TransferStatus;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
+@Getter
+@Setter
+@NoArgsConstructor
 
 public class Transfer {
     private Long transferId;
