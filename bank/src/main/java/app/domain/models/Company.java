@@ -11,6 +11,6 @@ import lombok.Setter;
 
 public class Company extends Client {
 
-    private SistemRole companyType;
+    private SistemRole role; // COMPANY, COMPANY_EMPLOYEE, COMPANY_SUPERVISOR
     
 }

@@ -19,7 +19,7 @@ public class Loan {
     private Client client;
     private Long amountRequested; //Monto solicitado
     private Long amountApproved; //Monto aprobado
-    private Long interest_rate; //Tasa de interés
+    private Long interestRate; //Tasa de interés
     private Integer term; //Plazo en meses
     private LoanStatus loanStatus;
     private LocalDate approvalDate; //Fecha de aprobación

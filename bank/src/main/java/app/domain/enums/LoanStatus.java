@@ -4,5 +4,5 @@ public enum LoanStatus {
     IN_STUDY,
     APPROVED,
     REJECTED,
-    UNPACKED // Desembolsado
+    DISBURSED // Desembolsado
 }
