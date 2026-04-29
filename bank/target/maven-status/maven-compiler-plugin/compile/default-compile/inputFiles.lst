@@ -1,4 +1,15 @@
 C:\Users\USER\Desktop\Bank\bank\src\main\java\app\Application.java
+C:\Users\USER\Desktop\Bank\bank\src\main\java\app\application\adapters\api\controllers\AuthController.java
+C:\Users\USER\Desktop\Bank\bank\src\main\java\app\application\adapters\api\request\LoginRequest.java
+C:\Users\USER\Desktop\Bank\bank\src\main\java\app\application\adapters\api\response\LoginResponse.java
+C:\Users\USER\Desktop\Bank\bank\src\main\java\app\application\usecases\AdministratorUseCase.java
+C:\Users\USER\Desktop\Bank\bank\src\main\java\app\application\usecases\AuthUseCase.java
+C:\Users\USER\Desktop\Bank\bank\src\main\java\app\application\usecases\ClientUseCase.java
+C:\Users\USER\Desktop\Bank\bank\src\main\java\app\application\usecases\CommercialEmployeeUseCase.java
+C:\Users\USER\Desktop\Bank\bank\src\main\java\app\application\usecases\CompanyEmployeeUseCase.java
+C:\Users\USER\Desktop\Bank\bank\src\main\java\app\application\usecases\CompanyUseCase.java
+C:\Users\USER\Desktop\Bank\bank\src\main\java\app\application\usecases\InternalAnalystUseCase.java
+C:\Users\USER\Desktop\Bank\bank\src\main\java\app\application\usecases\WindowEmployeeUseCase.java
 C:\Users\USER\Desktop\Bank\bank\src\main\java\app\domain\enums\AccountStatus.java
 C:\Users\USER\Desktop\Bank\bank\src\main\java\app\domain\enums\AccountType.java
 C:\Users\USER\Desktop\Bank\bank\src\main\java\app\domain\enums\Currency.java
@@ -61,3 +72,5 @@ C:\Users\USER\Desktop\Bank\bank\src\main\java\app\domain\services\UpdateBankProd
 C:\Users\USER\Desktop\Bank\bank\src\main\java\app\domain\services\UpdateClient.java
 C:\Users\USER\Desktop\Bank\bank\src\main\java\app\domain\services\UpdateUser.java
 C:\Users\USER\Desktop\Bank\bank\src\main\java\app\domain\services\WithdrawMoney.java
+C:\Users\USER\Desktop\Bank\bank\src\main\java\app\infraestructure\security\JwtUtil.java
+C:\Users\USER\Desktop\Bank\bank\src\main\java\app\infraestructure\security\UserDetailsServiceImpl.java

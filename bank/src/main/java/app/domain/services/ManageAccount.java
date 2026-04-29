@@ -3,6 +3,8 @@ package app.domain.services;
 import app.domain.enums.AccountStatus;
 import app.domain.ports.BankAccountPort;
 import app.domain.exceptions.BusinessException;
+import app.domain.models.BankAccount;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import java.math.BigDecimal;
@@ -17,7 +19,7 @@ public class ManageAccount {
         this.accountPort = accountPort;
     }
     
-    public void blockAccount(String accountNumber) throws BusinessException {
+    /*public void blockAccount(String accountNumber) throws BusinessException {
         var account = accountPort.findByAccountNumber(accountNumber);
         if (account == null) {
             throw new BusinessException("La cuenta no existe");
@@ -45,5 +47,30 @@ public class ManageAccount {
         }
         account.setAccountStatus(AccountStatus.CLOSED);
         accountPort.update(account);
+    }*/
+
+    public void manageAccount(BankAccount account, String operation){
+         account = accountPort.findByAccountNumber(account.getAccountNumber());
+        if (account == null) {
+            throw new BusinessException("La cuenta no existe");
+        }
+        switch (operation) {
+            case "block":
+                        account.setAccountStatus(AccountStatus.BLOCKED);
+        accountPort.update(account);
+                break;
+             case "unblock":
+                 account.setAccountStatus(AccountStatus.ACTIVE);
+        accountPort.update(account);
+                break;
+                 case "close":
+                 account.setAccountStatus(AccountStatus.CLOSED);
+        accountPort.update(account);
+                break;
+        
+            default:
+                throw new BusinessException("no existe el tipo de operacion");
+        }
+
     }
 }

@@ -3,8 +3,9 @@ package app.application.usecases;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import app.domain.models.Client;
+import app.domain.exceptions.BusinessException;
 import app.domain.models.Loan;
+import app.domain.models.Transfer;
 import app.domain.services.CreateTransfer;
 import app.domain.services.FindAccount;
 import app.domain.services.FindLoan;
@@ -35,17 +36,21 @@ public class ClientUseCase {
         this.createTransfer = createTransfer;
     }
     
-    public void FindAccount(String accountNumber) {
+    public void FindAccount(String accountNumber) throws BusinessException {
         findAccount.findByAccountNumber(accountNumber);
     }
-    public void FindLoan(String loanId) {
-        findLoan.findById(Long.parseLong(loanId));
+    public void FindLoan(Long loanId) throws BusinessException {
+        findLoan.findById(loanId);
     }
-    public void FindTransfer(String transferId) {
-        findTransfer.findById(Long.parseLong(transferId));
+    public void FindTransfer(Long transferId) throws BusinessException {
+        findTransfer.findById(transferId);
     }
-    public void RequestLoan (RequestLoan requestLoan) {
-        requestLoan.requestLoan(Loan loan, String clientDocument);
+    public void RequestLoan (Loan loan, String clientDocument) throws BusinessException {
+        requestLoan.requestLoan(loan, clientDocument);
+    }
+    public void CreateTransfer (Transfer transfer, String originAccountNumber, String destinationAccountNumber,
+                                String creatorDocument) throws BusinessException {
+        createTransfer.createTransfer(transfer, originAccountNumber, destinationAccountNumber, creatorDocument);
     }
     
 }
