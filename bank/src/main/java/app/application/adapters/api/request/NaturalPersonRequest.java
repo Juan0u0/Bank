@@ -3,27 +3,21 @@ package app.application.adapters.api.request;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.Size;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Past;
 import lombok.Getter;
 import lombok.Setter;
+import java.time.LocalDate;
 
 @Getter
 @Setter
-public class UserRequest {
+public class NaturalPersonRequest {
     
     @NotBlank(message = "El documento es obligatorio")
     private String document;
 
     @NotBlank(message = "El nombre es obligatorio")
     private String name;
-
-    @NotBlank(message = "El username es obligatorio")
-    private String username;
-
-    @NotBlank(message = "La contraseña es obligatoria")
-    private String password;
-
-    @NotBlank(message = "El rol es obligatorio")
-    private String role;
 
     @NotBlank(message = "El email es obligatorio")
     @Email(message = "El email debe tener un formato válido")
@@ -35,4 +29,8 @@ public class UserRequest {
 
     @NotBlank(message = "La dirección es obligatoria")
     private String adress;
+
+    @NotNull(message = "La fecha de nacimiento es obligatoria")
+    @Past(message = "La fecha de nacimiento debe ser en el pasado")
+    private LocalDate birthDate;
 }

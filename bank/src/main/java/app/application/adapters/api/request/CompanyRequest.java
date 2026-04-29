@@ -8,22 +8,22 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class UserRequest {
+public class CompanyRequest {
     
-    @NotBlank(message = "El documento es obligatorio")
+    @NotBlank(message = "El documento (NIT) es obligatorio")
     private String document;
 
-    @NotBlank(message = "El nombre es obligatorio")
+    @NotBlank(message = "El nombre de la razón social es obligatorio")
     private String name;
 
-    @NotBlank(message = "El username es obligatorio")
-    private String username;
+    @NotBlank(message = "La razón social es obligatoria")
+    private String companyName;
 
-    @NotBlank(message = "La contraseña es obligatoria")
-    private String password;
+    @NotBlank(message = "El NIT es obligatorio")
+    private String taxId;
 
-    @NotBlank(message = "El rol es obligatorio")
-    private String role;
+    @NotBlank(message = "El representante legal es obligatorio")
+    private String legalRepresentative;
 
     @NotBlank(message = "El email es obligatorio")
     @Email(message = "El email debe tener un formato válido")
