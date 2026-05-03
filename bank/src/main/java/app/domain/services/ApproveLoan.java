@@ -1,8 +1,8 @@
 package app.domain.services;
 
 import app.domain.models.Loan;
-import app.domain.enums.LoanStatus;
-import app.domain.enums.SistemRole;
+import app.domain.enums.approvalFlows.LoanStatus;
+import app.domain.enums.sistemRoles.SistemRole;
 import app.domain.ports.LoanPort;
 import app.domain.exceptions.BusinessException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,10 +14,12 @@ import java.math.BigDecimal;
 public class ApproveLoan {
     
     private final LoanPort loanPort;
+    private final RegisterOperation registerOperation;
     
     @Autowired
-    public ApproveLoan(LoanPort loanPort) {
+    public ApproveLoan(LoanPort loanPort, RegisterOperation registerOperation) {
         this.loanPort = loanPort;
+        this.registerOperation = registerOperation;
     }
     
     public void approveLoan(Long loanId, BigDecimal amountApproved, SistemRole userRole) throws BusinessException {
@@ -43,5 +45,13 @@ public class ApproveLoan {
         loan.setApprovalDate(LocalDateTime.now());
         
         loanPort.update(loan);
+        
+        // Registrar aprobación en bitácora (NoSQL)
+        registerOperation.registerLoanApproved(
+            null, // Se obtendrá del contexto de seguridad en la capa de aplicación
+            loanId,
+            amountApproved,
+            loan.getInterestRate()
+        );
     }
 }

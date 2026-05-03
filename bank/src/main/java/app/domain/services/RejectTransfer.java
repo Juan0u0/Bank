@@ -1,8 +1,8 @@
 package app.domain.services;
 
 import app.domain.models.Transfer;
-import app.domain.enums.TransferStatus;
-import app.domain.enums.SistemRole;
+import app.domain.enums.approvalFlows.TransferStatus;
+import app.domain.enums.sistemRoles.SistemRole;
 import app.domain.ports.TransferPort;
 import app.domain.exceptions.BusinessException;
 import org.springframework.beans.factory.annotation.Autowired;

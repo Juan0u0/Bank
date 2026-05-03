@@ -1,8 +1,8 @@
 package app.domain.services;
 
 import app.domain.models.Transfer;
-import app.domain.enums.TransferStatus;
-import app.domain.enums.SistemRole;
+import app.domain.enums.approvalFlows.TransferStatus;
+import app.domain.enums.sistemRoles.SistemRole;
 import app.domain.ports.TransferPort;
 import app.domain.ports.BankAccountPort;
 import app.domain.exceptions.BusinessException;

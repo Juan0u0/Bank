@@ -1,4 +1,4 @@
-package app.domain.enums;
+package app.domain.enums.status;
 
 public enum AccountType {
     SAVINGS,

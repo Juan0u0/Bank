@@ -1,8 +1,9 @@
 package app.domain.ports;
 
 import java.util.List;
+
+import app.domain.enums.approvalFlows.TransferStatus;
 import app.domain.models.Transfer;
-import app.domain.enums.TransferStatus;
 
 public interface TransferPort {
     

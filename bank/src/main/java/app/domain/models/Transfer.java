@@ -1,9 +1,11 @@
 package app.domain.models;
 
 import java.time.LocalDateTime;
+
+import app.domain.enums.approvalFlows.TransferStatus;
+
 import java.math.BigDecimal;
 
-import app.domain.enums.TransferStatus;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;

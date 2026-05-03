@@ -1,8 +1,9 @@
 package app.domain.ports;
 
 import java.util.List;
+
+import app.domain.enums.approvalFlows.LoanStatus;
 import app.domain.models.Loan;
-import app.domain.enums.LoanStatus;
 
 public interface LoanPort {
     

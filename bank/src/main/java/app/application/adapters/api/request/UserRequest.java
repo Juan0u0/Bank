@@ -3,6 +3,7 @@ package app.application.adapters.api.request;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.Size;
+import jakarta.validation.constraints.Pattern;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -35,4 +36,11 @@ public class UserRequest {
 
     @NotBlank(message = "La dirección es obligatoria")
     private String adress;
+
+    // Campos adicionales para registro de nuevos usuarios
+    @Pattern(regexp = "NATURAL_PERSON|COMPANY", message = "El tipo de usuario debe ser NATURAL_PERSON o COMPANY")
+    private String userType;
+
+    @Pattern(regexp = "^(\\d{4})-(\\d{2})-(\\d{2})$", message = "La fecha de nacimiento debe estar en formato YYYY-MM-DD")
+    private String birthDate;
 }

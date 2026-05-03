@@ -3,9 +3,9 @@ package app.domain.models;
 import java.time.LocalDateTime;
 import java.math.BigDecimal;
 
-import app.domain.enums.AccountStatus;
-import app.domain.enums.AccountType;
-import app.domain.enums.Currency;
+import app.domain.enums.status.AccountStatus;
+import app.domain.enums.status.AccountType;
+import app.domain.enums.status.Currency;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;

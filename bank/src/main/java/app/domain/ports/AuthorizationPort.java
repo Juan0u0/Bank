@@ -1,6 +1,6 @@
 package app.domain.ports;
 
-import app.domain.enums.SistemRole;
+import app.domain.enums.sistemRoles.SistemRole;
 
 public interface AuthorizationPort {
     

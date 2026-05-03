@@ -1,9 +1,9 @@
 package app.domain.services;
 
 import app.domain.models.Loan;
-import app.domain.enums.LoanStatus;
 import app.domain.ports.LoanPort;
 import app.domain.ports.ClientPort;
+import app.domain.enums.approvalFlows.LoanStatus;
 import app.domain.exceptions.BusinessException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -14,11 +14,13 @@ public class RequestLoan {
     
     private final LoanPort loanPort;
     private final ClientPort clientPort;
+    private final RegisterOperation registerOperation;
     
     @Autowired
-    public RequestLoan(LoanPort loanPort, ClientPort clientPort) {
+    public RequestLoan(LoanPort loanPort, ClientPort clientPort, RegisterOperation registerOperation) {
         this.loanPort = loanPort;
         this.clientPort = clientPort;
+        this.registerOperation = registerOperation;
     }
     
     public void requestLoan(Loan loan, String clientDocument) throws BusinessException {
@@ -30,6 +32,13 @@ public class RequestLoan {
         
         loan.setLoanStatus(LoanStatus.IN_STUDY);
         loanPort.save(loan);
+        
+        // Registrar solicitud de préstamo en bitácora
+        registerOperation.registerLoanRequested(
+            clientDocument,
+            loan.getLoanId(),
+            loan.getAmountRequested()
+        );
     }
     
     private void validateLoanData(Loan loan) throws BusinessException {

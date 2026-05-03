@@ -1,8 +1,8 @@
 package app.domain.services;
 
 import app.domain.models.Loan;
-import app.domain.enums.LoanStatus;
-import app.domain.enums.SistemRole;
+import app.domain.enums.approvalFlows.LoanStatus;
+import app.domain.enums.sistemRoles.SistemRole;
 import app.domain.ports.LoanPort;
 import app.domain.exceptions.BusinessException;
 import org.springframework.beans.factory.annotation.Autowired;

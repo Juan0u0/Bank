@@ -1,8 +1,8 @@
 package app.domain.services;
 
 import app.domain.models.User;
-import app.domain.enums.UserStatus;
 import app.domain.ports.UserPort;
+import app.domain.enums.status.UserStatus;
 import app.domain.exceptions.BusinessException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;

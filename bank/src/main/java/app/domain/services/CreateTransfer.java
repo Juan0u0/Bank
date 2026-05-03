@@ -1,8 +1,8 @@
 package app.domain.services;
 
 import app.domain.models.Transfer;
-import app.domain.enums.TransferStatus;
-import app.domain.enums.SistemRole;
+import app.domain.enums.approvalFlows.TransferStatus;
+import app.domain.enums.sistemRoles.SistemRole;
 import app.domain.ports.TransferPort;
 import app.domain.ports.BankAccountPort;
 import app.domain.ports.UserPort;
@@ -18,13 +18,15 @@ public class CreateTransfer {
     private final TransferPort transferPort;
     private final BankAccountPort accountPort;
     private final UserPort userPort;
+    private final RegisterOperation registerOperation;
     private static final BigDecimal TRANSFER_THRESHOLD = new BigDecimal("100000.00");
     
     @Autowired
-    public CreateTransfer(TransferPort transferPort, BankAccountPort accountPort, UserPort userPort) {
+    public CreateTransfer(TransferPort transferPort, BankAccountPort accountPort, UserPort userPort, RegisterOperation registerOperation) {
         this.transferPort = transferPort;
         this.accountPort = accountPort;
         this.userPort = userPort;
+        this.registerOperation = registerOperation;
     }
     
     public void createTransfer(Transfer transfer, String originAccountNumber, String destinationAccountNumber,
@@ -64,11 +66,23 @@ public class CreateTransfer {
         }
         
         transferPort.save(transfer);
+        
+        // Registrar creación de transferencia en bitácora
+        registerOperation.registerTransferCreated(
+            creatorDocument,
+            originAccountNumber,
+            destinationAccountNumber,
+            transfer.getAmount()
+        );
     }
     
     private void executeTransfer(Transfer transfer) throws BusinessException {
         var originAccount = transfer.getOriginAccount();
         var destAccount = transfer.getDestinationAccount();
+        
+        // Capturar saldos antes de la transferencia
+        BigDecimal balanceBeforeOrigin = originAccount.getBalance();
+        BigDecimal balanceBeforeDestination = destAccount.getBalance();
         
         // Actualizar saldo cuenta origen
         BigDecimal newOriginBalance = originAccount.getBalance().subtract(transfer.getAmount());
@@ -77,6 +91,18 @@ public class CreateTransfer {
         // Actualizar saldo cuenta destino
         BigDecimal newDestBalance = destAccount.getBalance().add(transfer.getAmount());
         accountPort.updateBalance(destAccount.getAccountNumber(), newDestBalance);
+        
+        // Registrar ejecución de transferencia en bitácora con detalles "antes y después"
+        registerOperation.registerTransferExecuted(
+            transfer.getCreatedBy().getDocument(),
+            originAccount.getAccountNumber(),
+            balanceBeforeOrigin,
+            newOriginBalance,
+            destAccount.getAccountNumber(),
+            balanceBeforeDestination,
+            newDestBalance,
+            transfer.getAmount()
+        );
     }
     
     private void validateTransferData(Transfer transfer) throws BusinessException {

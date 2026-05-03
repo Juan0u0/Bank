@@ -2,8 +2,8 @@ package app.application.adapters.persistence.sql;
 
 import app.application.adapters.persistence.sql.entities.TransferEntity;
 import app.application.adapters.persistence.sql.repositories.TransferRepository;
+import app.domain.enums.approvalFlows.TransferStatus;
 import app.domain.models.Transfer;
-import app.domain.enums.TransferStatus;
 import app.domain.ports.TransferPort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

@@ -7,7 +7,9 @@ import org.springframework.stereotype.Service;
 
 import app.domain.exceptions.BusinessException;
 import app.domain.models.BankAccount;
+import app.domain.models.User;
 import app.domain.services.CreateAccount;
+import app.domain.services.CreateUser;
 import app.domain.services.DepositMoney;
 import app.domain.services.FindAccount;
 import app.domain.services.WithdrawMoney;
@@ -18,18 +20,25 @@ public class WindowEmployeeUseCase {
     @Autowired
     private CreateAccount createAccount;
     @Autowired
+    private CreateUser createUser;
+    @Autowired
     private DepositMoney depositMoney;
     @Autowired
     private WithdrawMoney withdrawMoney;
     @Autowired
     private FindAccount findAccount;
 
-    public WindowEmployeeUseCase(   CreateAccount createAccount, DepositMoney depositMoney, WithdrawMoney withdrawMoney,
+    public WindowEmployeeUseCase(   CreateAccount createAccount, CreateUser createUser, DepositMoney depositMoney, WithdrawMoney withdrawMoney,
                                     FindAccount findAccount) {
         this.createAccount = createAccount;
+        this.createUser = createUser;
         this.depositMoney = depositMoney;
         this.withdrawMoney = withdrawMoney;
         this.findAccount = findAccount;
+    }
+
+    public void registerUser(User user) throws BusinessException {
+        createUser.createUser(user);
     }
 
     public void createAccount (BankAccount account, String clientDocument) throws BusinessException {
@@ -45,4 +54,7 @@ public class WindowEmployeeUseCase {
         findAccount.findByAccountNumber(accountNumber);
     }
     
+    public BankAccount getAccount(String accountNumber) throws BusinessException {
+        return findAccount.findByAccountNumber(accountNumber);
+    }
 }

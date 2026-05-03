@@ -1,13 +1,12 @@
 package app.domain.services;
 
-import app.domain.enums.AccountStatus;
 import app.domain.ports.BankAccountPort;
+import app.domain.enums.status.AccountStatus;
 import app.domain.exceptions.BusinessException;
 import app.domain.models.BankAccount;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import java.math.BigDecimal;
 
 @Service
 public class ManageAccount {

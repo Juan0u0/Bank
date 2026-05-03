@@ -10,7 +10,10 @@ import app.domain.services.CreateTransfer;
 import app.domain.services.FindAccount;
 import app.domain.services.FindLoan;
 import app.domain.services.FindTransfer;
+import app.domain.services.FindOperationLog;
 import app.domain.services.RequestLoan;
+
+import java.util.List;
 
 @Service
 public class ClientUseCase {
@@ -25,15 +28,18 @@ public class ClientUseCase {
     private RequestLoan requestLoan;
     @Autowired
     private CreateTransfer createTransfer;
+    @Autowired
+    private FindOperationLog findOperationLog;
 
     public ClientUseCase(   FindAccount findAccount, FindLoan findLoan, FindTransfer findTransfer, 
-                            RequestLoan requestLoan, CreateTransfer createTransfer) {
+                            RequestLoan requestLoan, CreateTransfer createTransfer, FindOperationLog findOperationLog) {
 
         this.findAccount = findAccount;
         this.findLoan = findLoan;
         this.findTransfer = findTransfer;
         this.requestLoan = requestLoan;
         this.createTransfer = createTransfer;
+        this.findOperationLog = findOperationLog;
     }
     
     public void FindAccount(String accountNumber) throws BusinessException {
@@ -53,4 +59,16 @@ public class ClientUseCase {
         createTransfer.createTransfer(transfer, originAccountNumber, destinationAccountNumber, creatorDocument);
     }
     
+    public List<app.domain.models.BankAccount> getClientAccounts(String clientDocument) throws BusinessException {
+        return findAccount.findByClientDocument(clientDocument);
+    }
+    
+    public List<Loan> getClientLoans(String clientDocument) throws BusinessException {
+        return findLoan.findByClientDocument(clientDocument);
+    }
+    
+    public String getPersonalAuditLog(String clientDocument) throws BusinessException {
+        var logs = findOperationLog.findByUserDocument(clientDocument);
+        return logs != null ? logs.toString() : "No hay registros de operaciones";
+    }
 }

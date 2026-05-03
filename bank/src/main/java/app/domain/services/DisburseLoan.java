@@ -1,8 +1,8 @@
 package app.domain.services;
 
 import app.domain.models.Loan;
-import app.domain.enums.LoanStatus;
-import app.domain.enums.SistemRole;
+import app.domain.enums.approvalFlows.LoanStatus;
+import app.domain.enums.sistemRoles.SistemRole;
 import app.domain.ports.LoanPort;
 import app.domain.ports.BankAccountPort;
 import app.domain.exceptions.BusinessException;
@@ -16,11 +16,13 @@ public class DisburseLoan {
     
     private final LoanPort loanPort;
     private final BankAccountPort accountPort;
+    private final RegisterOperation registerOperation;
     
     @Autowired
-    public DisburseLoan(LoanPort loanPort, BankAccountPort accountPort) {
+    public DisburseLoan(LoanPort loanPort, BankAccountPort accountPort, RegisterOperation registerOperation) {
         this.loanPort = loanPort;
         this.accountPort = accountPort;
+        this.registerOperation = registerOperation;
     }
     
     public void disburse(Long loanId, SistemRole userRole) throws BusinessException {
@@ -50,8 +52,11 @@ public class DisburseLoan {
             throw new BusinessException("El monto aprobado debe ser mayor a cero");
         }
         
+        // Guardar saldo anterior para auditoría
+        BigDecimal balanceBefore = account.getBalance();
+        
         // Actualizar saldo de la cuenta
-        BigDecimal newBalance = account.getBalance().add(loan.getAmountApproved());
+        BigDecimal newBalance = balanceBefore.add(loan.getAmountApproved());
         accountPort.updateBalance(account.getAccountNumber(), newBalance);
         
         // Actualizar estado del préstamo
@@ -59,5 +64,13 @@ public class DisburseLoan {
         loan.setDisbursementDate(LocalDateTime.now());
         
         loanPort.update(loan);
+        
+        // Registrar operación en bitácora (NoSQL)
+        registerOperation.registerLoanDisbursed(
+            loan.getClient().getDocument(), 
+            loanId, 
+            loan.getAmountApproved(), 
+            account.getAccountNumber()
+        );
     }
 }

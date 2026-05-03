@@ -3,8 +3,8 @@ package app.domain.models;
 import java.time.LocalDateTime;
 import java.math.BigDecimal;
 
-import app.domain.enums.LoanStatus;
 import app.domain.enums.LoanType;
+import app.domain.enums.approvalFlows.LoanStatus;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;

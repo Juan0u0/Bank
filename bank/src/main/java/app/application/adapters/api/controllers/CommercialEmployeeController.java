@@ -3,129 +3,75 @@ package app.application.adapters.api.controllers;
 import app.application.adapters.api.request.*;
 import app.application.adapters.api.response.ApiResponse;
 import app.application.usecases.CommercialEmployeeUseCase;
-import app.domain.models.*;
-import app.domain.exceptions.BusinessException;
-import app.domain.enums.LoanType;
+import app.infraestructure.security.JwtUtil;
 import jakarta.validation.Valid;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/commercial-employee")
+@RequiredArgsConstructor
 public class CommercialEmployeeController {
 
-    @Autowired
-    private CommercialEmployeeUseCase commercialEmployeeUseCase;
+    private final CommercialEmployeeUseCase commercialEmployeeUseCase;
+    private final JwtUtil jwtUtil;
 
-    public CommercialEmployeeController(CommercialEmployeeUseCase commercialEmployeeUseCase) {
-        this.commercialEmployeeUseCase = commercialEmployeeUseCase;
+    // ── Consultar información de clientes bajo gestión ───────────────────────
+
+    @GetMapping("/clients/managed")
+    public ResponseEntity<ApiResponse<List<?>>> getManagedClients(
+            @RequestHeader("Authorization") String token) {
+        String employeeDocument = extractDocumentFromToken(token);
+
+        List<?> managedClients = commercialEmployeeUseCase.getManagedClients(employeeDocument);
+
+        return ResponseEntity.ok(
+            new ApiResponse<>(true, "Clientes bajo gestión consultados exitosamente", managedClients)
+        );
     }
 
-    @PostMapping("/natural-persons")
-    public ResponseEntity<ApiResponse<String>> createNaturalPerson(
-            @Valid @RequestBody NaturalPersonRequest request) {
-        try {
-            NaturalPerson naturalPerson = new NaturalPerson();
-            naturalPerson.setDocument(request.getDocument());
-            naturalPerson.setName(request.getName());
-            naturalPerson.setEmail(request.getEmail());
-            naturalPerson.setCellPhone(request.getCellPhone());
-            naturalPerson.setAdress(request.getAdress());
-            naturalPerson.setBirthDate(request.getBirthDate());
-            
-            commercialEmployeeUseCase.createNaturalPerson(naturalPerson);
-            return ResponseEntity.status(HttpStatus.CREATED).body(
-                new ApiResponse<>(true, "Persona natural registrada exitosamente", request.getDocument())
-            );
-        } catch (BusinessException e) {
-            return ResponseEntity.badRequest().body(
-                new ApiResponse<>(false, e.getMessage(), null)
-            );
-        }
+    // ── Crear solicitudes de productos en nombre del cliente ──────────────────
+
+    @PostMapping("/products/apply")
+    public ResponseEntity<ApiResponse<String>> applyForProduct(
+            @Valid @RequestBody ProductApplicationRequest request,
+            @RequestHeader("Authorization") String token) {
+        String employeeDocument = extractDocumentFromToken(token);
+
+        String result = commercialEmployeeUseCase.applyForProduct(
+            employeeDocument,
+            request.getClientDocument(),
+            request.getProductType(),
+            request.getProductDetails()
+        );
+
+        return ResponseEntity.status(HttpStatus.CREATED).body(
+            new ApiResponse<>(true, "Solicitud de producto creada exitosamente", result)
+        );
     }
 
-    @PostMapping("/companies")
-    public ResponseEntity<ApiResponse<String>> createCompany(
-            @Valid @RequestBody CompanyRequest request) {
-        try {
-            Company company = new Company();
-            company.setDocument(request.getDocument());
-            company.setName(request.getName());
-            company.setCompanyName(request.getCompanyName());
-            company.setTaxId(request.getTaxId());
-            company.setLegalRepresentative(request.getLegalRepresentative());
-            company.setEmail(request.getEmail());
-            company.setCellPhone(request.getCellPhone());
-            company.setAdress(request.getAdress());
-            
-            commercialEmployeeUseCase.createCompany(company);
-            return ResponseEntity.status(HttpStatus.CREATED).body(
-                new ApiResponse<>(true, "Empresa registrada exitosamente", request.getDocument())
-            );
-        } catch (BusinessException e) {
-            return ResponseEntity.badRequest().body(
-                new ApiResponse<>(false, e.getMessage(), null)
-            );
-        }
+    // ── Seguimiento de solicitudes de préstamos ───────────────────────────────
+
+    @GetMapping("/loans/track")
+    public ResponseEntity<ApiResponse<List<?>>> trackLoans(
+            @RequestHeader("Authorization") String token) {
+        String employeeDocument = extractDocumentFromToken(token);
+
+        List<?> loanTracking = commercialEmployeeUseCase.trackManagedLoans(employeeDocument);
+
+        return ResponseEntity.ok(
+            new ApiResponse<>(true, "Seguimiento de préstamos obtenido exitosamente", loanTracking)
+        );
     }
 
-    @PostMapping("/users")
-    public ResponseEntity<ApiResponse<String>> createUser(
-            @Valid @RequestBody UserRequest request) {
-        try {
-            User user = new User();
-            user.setDocument(request.getDocument());
-            user.setName(request.getName());
-            user.setUsername(request.getUsername());
-            user.setPassword(request.getPassword());
-            user.setEmail(request.getEmail());
-            user.setCellPhone(request.getCellPhone());
-            user.setAdress(request.getAdress());
-            
-            commercialEmployeeUseCase.createUser(user);
-            return ResponseEntity.status(HttpStatus.CREATED).body(
-                new ApiResponse<>(true, "Usuario creado exitosamente", request.getUsername())
-            );
-        } catch (BusinessException e) {
-            return ResponseEntity.badRequest().body(
-                new ApiResponse<>(false, e.getMessage(), null)
-            );
-        }
-    }
+    // ── Métodos auxiliares ───────────────────────────────────────────────────
 
-    @PostMapping("/loans/request")
-    public ResponseEntity<ApiResponse<String>> requestLoan(
-            @Valid @RequestBody RequestLoanRequest request,
-            @RequestParam String clientDocument) {
-        try {
-            Loan loan = new Loan();
-            loan.setAmountRequested(request.getAmountRequested());
-            loan.setInterestRate(request.getInterestRate());
-            loan.setTerm(request.getTerm());
-            loan.setLoanType(LoanType.valueOf(request.getLoanType().toUpperCase()));
-            
-            commercialEmployeeUseCase.requestLoan(loan, clientDocument);
-            return ResponseEntity.status(HttpStatus.CREATED).body(
-                new ApiResponse<>(true, "Solicitud de préstamo registrada exitosamente", "En estudio")
-            );
-        } catch (BusinessException e) {
-            return ResponseEntity.badRequest().body(
-                new ApiResponse<>(false, e.getMessage(), null)
-            );
-        }
-    }
-
-    @GetMapping("/loans/{loanId}")
-    public ResponseEntity<ApiResponse<String>> findLoan(@PathVariable Long loanId) {
-        try {
-            commercialEmployeeUseCase.findLoan(loanId);
-            return ResponseEntity.ok(new ApiResponse<>(true, "Préstamo encontrado", loanId.toString()));
-        } catch (BusinessException e) {
-            return ResponseEntity.badRequest().body(
-                new ApiResponse<>(false, e.getMessage(), null)
-            );
-        }
+    private String extractDocumentFromToken(String token) {
+        String bearerToken = token.replace("Bearer ", "");
+        return jwtUtil.extractDocument(bearerToken);
     }
 }

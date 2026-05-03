@@ -1,6 +1,6 @@
 package app.domain.models;
 
-import app.domain.enums.SistemRole;
+import app.domain.enums.sistemRoles.SistemRole;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;

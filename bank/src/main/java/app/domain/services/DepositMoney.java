@@ -1,8 +1,8 @@
 package app.domain.services;
 
 import app.domain.models.BankAccount;
-import app.domain.enums.AccountStatus;
 import app.domain.ports.BankAccountPort;
+import app.domain.enums.status.AccountStatus;
 import app.domain.exceptions.BusinessException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;

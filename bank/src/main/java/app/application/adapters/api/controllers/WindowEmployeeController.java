@@ -1,98 +1,98 @@
 package app.application.adapters.api.controllers;
 
-import app.application.adapters.api.request.CreateAccountRequest;
-import app.application.adapters.api.request.DepositRequest;
-import app.application.adapters.api.request.WithdrawRequest;
+import app.application.adapters.api.request.*;
 import app.application.adapters.api.response.ApiResponse;
-
 import app.application.usecases.WindowEmployeeUseCase;
 import app.domain.models.BankAccount;
-import app.domain.exceptions.BusinessException;
+import app.domain.models.User;
+import app.domain.enums.sistemRoles.SistemRole;
+import app.domain.enums.status.UserStatus;
 import app.infraestructure.security.JwtUtil;
 import jakarta.validation.Valid;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.math.BigDecimal;
+
 @RestController
 @RequestMapping("/window-employee")
+@RequiredArgsConstructor
 public class WindowEmployeeController {
 
-    @Autowired
-    private WindowEmployeeUseCase windowEmployeeUseCase;
-    
-    @Autowired
-    private JwtUtil jwtUtil;
+    private final WindowEmployeeUseCase windowEmployeeUseCase;
+    private final JwtUtil jwtUtil;
 
-    public WindowEmployeeController(WindowEmployeeUseCase windowEmployeeUseCase, JwtUtil jwtUtil) {
-        this.windowEmployeeUseCase = windowEmployeeUseCase;
-        this.jwtUtil = jwtUtil;
+    // ── Registro de nuevos usuarios/clientes ──────────────────────────────────
+
+    @PostMapping("/register")
+    public ResponseEntity<ApiResponse<String>> registerUser(
+            @Valid @RequestBody UserRequest request) {
+        User user = new User();
+        user.setDocument(request.getDocument());
+        user.setName(request.getName());
+        user.setUsername(request.getUsername());
+        user.setPassword(request.getPassword());
+        user.setEmail(request.getEmail());
+        user.setCellPhone(request.getCellPhone());
+        user.setAdress(request.getAdress());
+        user.setStatus(UserStatus.ACTIVE);
+        user.setRole(SistemRole.valueOf(request.getRole().toUpperCase()));
+        
+        windowEmployeeUseCase.registerUser(user);
+        return ResponseEntity.status(HttpStatus.CREATED).body(
+            new ApiResponse<>(true, "Usuario registrado exitosamente", user.getDocument())
+        );
     }
+
+    // ── Apertura de cuentas ──────────────────────────────────────────────────
 
     @PostMapping("/accounts")
     public ResponseEntity<ApiResponse<String>> createAccount(
             @Valid @RequestBody CreateAccountRequest request,
             @RequestHeader("Authorization") String token) {
-        try {
-            String userDocument = extractDocumentFromToken(token);
-            BankAccount account = new BankAccount();
-            account.setAccountType(app.domain.enums.AccountType.valueOf(request.getAccountType().toUpperCase()));
-            account.setBalance(request.getBalance());
-            account.setCurrency(app.domain.enums.Currency.valueOf(request.getCurrency().toUpperCase()));
-            
-            windowEmployeeUseCase.createAccount(account, request.getClientDocument());
-            return ResponseEntity.status(HttpStatus.CREATED).body(
-                new ApiResponse<>(true, "Cuenta creada exitosamente", account.getAccountNumber())
-            );
-        } catch (BusinessException e) {
-            return ResponseEntity.badRequest().body(
-                new ApiResponse<>(false, e.getMessage(), null)
-            );
-        }
+        BankAccount account = new BankAccount();
+        account.setAccountType(request.getAccountType());
+        account.setCurrency(request.getCurrency());
+
+        windowEmployeeUseCase.createAccount(account, request.getClientDocument());
+        return ResponseEntity.status(HttpStatus.CREATED).body(
+            new ApiResponse<>(true, "Cuenta creada exitosamente", account.getAccountNumber())
+        );
     }
 
-    @PostMapping("/deposits")
-    public ResponseEntity<ApiResponse<String>> depositMoney(
+    // ── Consultar saldo ──────────────────────────────────────────────────────
+
+    @GetMapping("/accounts/{id}/balance")
+    public ResponseEntity<ApiResponse<BigDecimal>> getAccountBalance(
+            @PathVariable String id,
+            @RequestHeader("Authorization") String token) {
+        BankAccount account = windowEmployeeUseCase.getAccount(id);
+        return ResponseEntity.ok(new ApiResponse<>(true, "Saldo consultado exitosamente", account.getBalance()));
+    }
+
+    // ── Depósitos y retiros ──────────────────────────────────────────────────
+
+    @PostMapping("/transactions/deposit")
+    public ResponseEntity<ApiResponse<String>> deposit(
             @Valid @RequestBody DepositRequest request,
             @RequestHeader("Authorization") String token) {
-        try {
-            String userDocument = extractDocumentFromToken(token);
-            windowEmployeeUseCase.depositMoney(request.getAccountNumber(), request.getAmount(), userDocument);
-            return ResponseEntity.ok(new ApiResponse<>(true, "Depósito realizado exitosamente", request.getAccountNumber()));
-        } catch (BusinessException e) {
-            return ResponseEntity.badRequest().body(
-                new ApiResponse<>(false, e.getMessage(), null)
-            );
-        }
+        String userDocument = extractDocumentFromToken(token);
+        windowEmployeeUseCase.depositMoney(request.getAccountNumber(), request.getAmount(), userDocument);
+        return ResponseEntity.ok(new ApiResponse<>(true, "Depósito realizado exitosamente", request.getAccountNumber()));
     }
 
-    @PostMapping("/withdrawals")
-    public ResponseEntity<ApiResponse<String>> withdrawMoney(
+    @PostMapping("/transactions/withdraw")
+    public ResponseEntity<ApiResponse<String>> withdraw(
             @Valid @RequestBody WithdrawRequest request,
             @RequestHeader("Authorization") String token) {
-        try {
-            String userDocument = extractDocumentFromToken(token);
-            windowEmployeeUseCase.withdrawMoney(request.getAccountNumber(), request.getAmount(), userDocument);
-            return ResponseEntity.ok(new ApiResponse<>(true, "Retiro realizado exitosamente", request.getAccountNumber()));
-        } catch (BusinessException e) {
-            return ResponseEntity.badRequest().body(
-                new ApiResponse<>(false, e.getMessage(), null)
-            );
-        }
+        String userDocument = extractDocumentFromToken(token);
+        windowEmployeeUseCase.withdrawMoney(request.getAccountNumber(), request.getAmount(), userDocument);
+        return ResponseEntity.ok(new ApiResponse<>(true, "Retiro realizado exitosamente", request.getAccountNumber()));
     }
 
-    @GetMapping("/accounts/{accountNumber}")
-    public ResponseEntity<ApiResponse<String>> findAccount(@PathVariable String accountNumber) {
-        try {
-            windowEmployeeUseCase.findAccount(accountNumber);
-            return ResponseEntity.ok(new ApiResponse<>(true, "Cuenta encontrada", accountNumber));
-        } catch (BusinessException e) {
-            return ResponseEntity.badRequest().body(
-                new ApiResponse<>(false, e.getMessage(), null)
-            );
-        }
-    }
+    // ── Métodos auxiliares ───────────────────────────────────────────────────
 
     private String extractDocumentFromToken(String token) {
         String bearerToken = token.replace("Bearer ", "");

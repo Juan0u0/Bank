@@ -1,0 +1,409 @@
+{
+  "info": {
+    "name": "Bank API - Endpoints Tests",
+    "_postman_id": "bank-api-endpoints-tests",
+    "description": "Colección importable en Postman con los casos definidos en pruebas_endpoints.json",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    { "key": "baseUrl", "value": "http://localhost:8083" },
+    { "key": "token", "value": "" },
+    { "key": "clientDocument", "value": "983920394" },
+    { "key": "newClientDocument", "value": "1098765432" },
+    { "key": "loanIdApprove", "value": "1001" },
+    { "key": "loanIdReject", "value": "1002" }
+  ],
+  "item": [
+    {
+      "name": "Auth - Login (obtener token)",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{ \"username\": \"ADMINISTRATOR\", \"password\": \"123\" }"
+        },
+        "url": { "raw": "{{baseUrl}}/auth/login", "host": ["{{baseUrl}}"], "path": ["auth", "login"] }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "var json = pm.response.json();",
+              "if (json && json.token) { pm.environment.set('token', 'Bearer ' + json.token); }",
+              "pm.test('token saved', function () { pm.expect(pm.environment.get('token')).to.exist; });"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Client - Get my products",
+      "request": {
+        "method": "GET",
+        "header": [
+          { "key": "Authorization", "value": "{{token}}" }
+        ],
+        "url": { "raw": "{{baseUrl}}/client/my-products", "host": ["{{baseUrl}}"], "path": ["client", "my-products"] }
+      }
+    },
+    {
+      "name": "Client - Get my history",
+      "request": {
+        "method": "GET",
+        "header": [
+          { "key": "Authorization", "value": "{{token}}" }
+        ],
+        "url": { "raw": "{{baseUrl}}/client/my-history", "host": ["{{baseUrl}}"], "path": ["client", "my-history"] }
+      }
+    },
+    {
+      "name": "Client - Find account",
+      "request": {
+        "method": "GET",
+        "header": [
+          { "key": "Authorization", "value": "{{token}}" }
+        ],
+        "url": { "raw": "{{baseUrl}}/client/accounts/4001-1234-5678-9012", "host": ["{{baseUrl}}"], "path": ["client", "accounts", "4001-1234-5678-9012"] }
+      }
+    },
+    {
+      "name": "Client - Find loan",
+      "request": {
+        "method": "GET",
+        "header": [
+          { "key": "Authorization", "value": "{{token}}" }
+        ],
+        "url": { "raw": "{{baseUrl}}/client/loans/1001", "host": ["{{baseUrl}}"], "path": ["client", "loans", "1001"] }
+      }
+    },
+    {
+      "name": "Client - Find transfer",
+      "request": {
+        "method": "GET",
+        "header": [
+          { "key": "Authorization", "value": "{{token}}" }
+        ],
+        "url": { "raw": "{{baseUrl}}/client/transfers/1001", "host": ["{{baseUrl}}"], "path": ["client", "transfers", "1001"] }
+      }
+    },
+    {
+      "name": "Commercial Employee - Get managed clients",
+      "request": {
+        "method": "GET",
+        "header": [
+          { "key": "Authorization", "value": "{{token}}" }
+        ],
+        "url": { "raw": "{{baseUrl}}/commercial-employee/clients/managed", "host": ["{{baseUrl}}"], "path": ["commercial-employee", "clients", "managed"] }
+      }
+    },
+    {
+      "name": "Commercial Employee - Track loans",
+      "request": {
+        "method": "GET",
+        "header": [
+          { "key": "Authorization", "value": "{{token}}" }
+        ],
+        "url": { "raw": "{{baseUrl}}/commercial-employee/loans/track", "host": ["{{baseUrl}}"], "path": ["commercial-employee", "loans", "track"] }
+      }
+    },
+    {
+      "name": "Company Supervisor - Get pending transfers",
+      "request": {
+        "method": "GET",
+        "header": [
+          { "key": "Authorization", "value": "{{token}}" }
+        ],
+        "url": { "raw": "{{baseUrl}}/company-supervisor/company/pending-transfers", "host": ["{{baseUrl}}"], "path": ["company-supervisor", "company", "pending-transfers"] }
+      }
+    },
+    {
+      "name": "Company Supervisor - Delete staff user",
+      "request": {
+        "method": "DELETE",
+        "header": [
+          { "key": "Authorization", "value": "{{token}}" }
+        ],
+        "url": { "raw": "{{baseUrl}}/company-supervisor/company/manage-staff/1098765432", "host": ["{{baseUrl}}"], "path": ["company-supervisor", "company", "manage-staff", "1098765432"] }
+      }
+    },
+    {
+      "name": "Window Employee - Get account balance",
+      "request": {
+        "method": "GET",
+        "header": [
+          { "key": "Authorization", "value": "{{token}}" }
+        ],
+        "url": { "raw": "{{baseUrl}}/window-employee/accounts/4001-1234-5678-9012/balance", "host": ["{{baseUrl}}"], "path": ["window-employee", "accounts", "4001-1234-5678-9012", "balance"] }
+      }
+    },
+    {
+      "name": "Internal Analyst - Get pending loans",
+      "request": {
+        "method": "GET",
+        "header": [
+          { "key": "Authorization", "value": "{{token}}" }
+        ],
+        "url": { "raw": "{{baseUrl}}/internal-analyst/loans/pending", "host": ["{{baseUrl}}"], "path": ["internal-analyst", "loans", "pending"] }
+      }
+    },
+    {
+      "name": "Internal Analyst - Get full audit log",
+      "request": {
+        "method": "GET",
+        "header": [
+          { "key": "Authorization", "value": "{{token}}" }
+        ],
+        "url": { "raw": "{{baseUrl}}/internal-analyst/audit/full-log", "host": ["{{baseUrl}}"], "path": ["internal-analyst", "audit", "full-log"] }
+      }
+    },
+    {
+      "name": "Internal Analyst - Get audit log",
+      "request": {
+        "method": "GET",
+        "header": [
+          { "key": "Authorization", "value": "{{token}}" }
+        ],
+        "url": { "raw": "{{baseUrl}}/internal-analyst/audit/log", "host": ["{{baseUrl}}"], "path": ["internal-analyst", "audit", "log"] }
+      }
+    },
+    {
+      "name": "Internal Analyst - Find operation log",
+      "request": {
+        "method": "GET",
+        "header": [
+          { "key": "Authorization", "value": "{{token}}" }
+        ],
+        "url": { "raw": "{{baseUrl}}/internal-analyst/operation-logs/1001", "host": ["{{baseUrl}}"], "path": ["internal-analyst", "operation-logs", "1001"] }
+      }
+    },
+    {
+      "name": "Window Employee - Register user",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" },
+          { "key": "Authorization", "value": "{{token}}" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{ \"document\": \"{{newClientDocument}}\", \"name\": \"Juan Carlos Pérez González\", \"username\": \"juanperez2025\", \"password\": \"SecurePass123!@\", \"email\": \"juan.perez@email.com\", \"cellPhone\": \"3125551234\", \"adress\": \"Calle 45 No. 23-67, Apto 502, Bogotá\", \"userType\": \"NATURAL_PERSON\", \"birthDate\": \"1995-03-15\", \"role\": \"CLIENT\" }"
+        },
+        "url": { "raw": "{{baseUrl}}/window-employee/register", "host": ["{{baseUrl}}"], "path": ["window-employee", "register"] }
+      }
+    },
+    {
+      "name": "Window Employee - Open savings account",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" },
+          { "key": "Authorization", "value": "{{token}}" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{ \"clientDocument\": \"{{clientDocument}}\", \"accountType\": \"SAVINGS\", \"currency\": \"COP\" }"
+        },
+        "url": { "raw": "{{baseUrl}}/window-employee/accounts", "host": ["{{baseUrl}}"], "path": ["window-employee", "accounts"] }
+      }
+    },
+    {
+      "name": "Window Employee - Open current account",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" },
+          { "key": "Authorization", "value": "{{token}}" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{ \"clientDocument\": \"{{clientDocument}}\", \"accountType\": \"CURRENT\", \"currency\": \"USD\" }"
+        },
+        "url": { "raw": "{{baseUrl}}/window-employee/accounts", "host": ["{{baseUrl}}"], "path": ["window-employee", "accounts"] }
+      }
+    },
+    {
+      "name": "Window Employee - Open business account",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" },
+          { "key": "Authorization", "value": "{{token}}" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{ \"clientDocument\": \"{{clientDocument}}\", \"accountType\": \"BUSINESS\", \"currency\": \"EUR\" }"
+        },
+        "url": { "raw": "{{baseUrl}}/window-employee/accounts", "host": ["{{baseUrl}}"], "path": ["window-employee", "accounts"] }
+      }
+    },
+    {
+      "name": "Client - Request personal loan",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" },
+          { "key": "Authorization", "value": "{{token}}" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{ \"loanType\": \"Consumo\", \"amountRequested\": 5000000, \"interestRate\": 16.5, \"term\": 24 }"
+        },
+        "url": { "raw": "{{baseUrl}}/client/loans/request", "host": ["{{baseUrl}}"], "path": ["client", "loans", "request"] }
+      }
+    },
+    {
+      "name": "Client - Request vehicle loan",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" },
+          { "key": "Authorization", "value": "{{token}}" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{ \"loanType\": \"Vehículo\", \"amountRequested\": 35000000, \"interestRate\": 12.3, \"term\": 60 }"
+        },
+        "url": { "raw": "{{baseUrl}}/client/loans/request", "host": ["{{baseUrl}}"], "path": ["client", "loans", "request"] }
+      }
+    },
+    {
+      "name": "Client - Request mortgage loan",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" },
+          { "key": "Authorization", "value": "{{token}}" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{ \"loanType\": \"Hipotecario\", \"amountRequested\": 250000000, \"interestRate\": 8.5, \"term\": 180 }"
+        },
+        "url": { "raw": "{{baseUrl}}/client/loans/request", "host": ["{{baseUrl}}"], "path": ["client", "loans", "request"] }
+      }
+    },
+    {
+      "name": "Client - Request business loan",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" },
+          { "key": "Authorization", "value": "{{token}}" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{ \"loanType\": \"Empresarial\", \"amountRequested\": 100000000, \"interestRate\": 10.8, \"term\": 36 }"
+        },
+        "url": { "raw": "{{baseUrl}}/client/loans/request", "host": ["{{baseUrl}}"], "path": ["client", "loans", "request"] }
+      }
+    },
+    {
+      "name": "Client - Create internal transfer",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" },
+          { "key": "Authorization", "value": "{{token}}" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{ \"originAccountNumber\": \"4001-1234-5678-9012\", \"destinationAccountNumber\": \"4001-8765-4321-0987\", \"amount\": 1500000 }"
+        },
+        "url": { "raw": "{{baseUrl}}/client/transfers", "host": ["{{baseUrl}}"], "path": ["client", "transfers"] }
+      }
+    },
+    {
+      "name": "Client - Create transfer to third party",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" },
+          { "key": "Authorization", "value": "{{token}}" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{ \"originAccountNumber\": \"4001-1234-5678-9012\", \"destinationAccountNumber\": \"4002-5555-6666-7777\", \"amount\": 2500000 }"
+        },
+        "url": { "raw": "{{baseUrl}}/client/transfers", "host": ["{{baseUrl}}"], "path": ["client", "transfers"] }
+      }
+    },
+    {
+      "name": "Client - Create low amount transfer",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" },
+          { "key": "Authorization", "value": "{{token}}" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{ \"originAccountNumber\": \"4001-1234-5678-9012\", \"destinationAccountNumber\": \"4002-1111-2222-3333\", \"amount\": 100000 }"
+        },
+        "url": { "raw": "{{baseUrl}}/client/transfers", "host": ["{{baseUrl}}"], "path": ["client", "transfers"] }
+      }
+    },
+    {
+      "name": "Internal Analyst - Approve loan",
+      "request": {
+        "method": "PUT",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" },
+          { "key": "Authorization", "value": "{{token}}" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{ \"loanId\": 1001, \"action\": \"APPROVE\", \"amountApproved\": 5000000 }"
+        },
+        "url": { "raw": "{{baseUrl}}/internal-analyst/loans/{{loanIdApprove}}/evaluate", "host": ["{{baseUrl}}"], "path": ["internal-analyst", "loans", "{{loanIdApprove}}", "evaluate"] }
+      }
+    },
+    {
+      "name": "Internal Analyst - Reject loan",
+      "request": {
+        "method": "PUT",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" },
+          { "key": "Authorization", "value": "{{token}}" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{ \"loanId\": 1002, \"action\": \"REJECT\" }"
+        },
+        "url": { "raw": "{{baseUrl}}/internal-analyst/loans/{{loanIdReject}}/evaluate", "host": ["{{baseUrl}}"], "path": ["internal-analyst", "loans", "{{loanIdReject}}", "evaluate"] }
+      }
+    },
+    {
+      "name": "Window Employee - Deposit",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" },
+          { "key": "Authorization", "value": "{{token}}" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{ \"accountNumber\": \"4001-1234-5678-9012\", \"amount\": 3000000 }"
+        },
+        "url": { "raw": "{{baseUrl}}/window-employee/transactions/deposit", "host": ["{{baseUrl}}"], "path": ["window-employee", "transactions", "deposit"] }
+      }
+    },
+    {
+      "name": "Window Employee - Withdraw",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" },
+          { "key": "Authorization", "value": "{{token}}" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{ \"accountNumber\": \"4001-1234-5678-9012\", \"amount\": 500000 }"
+        },
+        "url": { "raw": "{{baseUrl}}/window-employee/transactions/withdraw", "host": ["{{baseUrl}}"], "path": ["window-employee", "transactions", "withdraw"] }
+      }
+    }
+  ]
+}

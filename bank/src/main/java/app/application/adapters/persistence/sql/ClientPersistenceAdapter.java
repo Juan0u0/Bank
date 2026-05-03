@@ -2,10 +2,10 @@ package app.application.adapters.persistence.sql;
 
 import app.application.adapters.persistence.sql.entities.ClientEntity;
 import app.application.adapters.persistence.sql.repositories.ClientRepository;
+import app.domain.enums.sistemRoles.SistemRole;
 import app.domain.models.Client;
 import app.domain.models.NaturalPerson;
 import app.domain.models.Company;
-import app.domain.enums.SistemRole;
 import app.domain.ports.ClientPort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

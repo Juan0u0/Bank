@@ -1,4 +1,4 @@
-package app.domain.enums;
+package app.domain.enums.sistemRoles;
 
 public enum SistemRole{
     //NATURAL_PERSON,

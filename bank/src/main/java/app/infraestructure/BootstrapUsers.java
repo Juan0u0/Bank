@@ -1,7 +1,7 @@
 package app.infraestructure;
 
-import app.domain.enums.SistemRole;
-import app.domain.enums.UserStatus;
+import app.domain.enums.sistemRoles.SistemRole;
+import app.domain.enums.status.UserStatus;
 import app.domain.models.User;
 import app.domain.ports.UserPort;
 import org.springframework.boot.ApplicationArguments;

@@ -4,19 +4,19 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.Setter;
-import app.domain.enums.status.AccountType;
-import app.domain.enums.status.Currency;
+
+import java.util.Map;
 
 @Getter
 @Setter
-public class CreateAccountRequest {
+public class ProductApplicationRequest {
     
     @NotBlank(message = "El documento del cliente es obligatorio")
     private String clientDocument;
-
-    @NotNull(message = "El tipo de cuenta es obligatorio")
-    private AccountType accountType;
-
-    @NotNull(message = "La moneda es obligatoria")
-    private Currency currency;
+    
+    @NotBlank(message = "El tipo de producto es obligatorio")
+    private String productType; // LOAN, ACCOUNT, etc.
+    
+    @NotNull(message = "Los detalles del producto son obligatorios")
+    private Map<String, Object> productDetails;
 }

@@ -1,5 +1,8 @@
 package app.application.usecases;
 
+import java.util.List;
+import java.util.Map;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -9,6 +12,7 @@ import app.domain.models.Company;
 import app.domain.models.Loan;
 import app.domain.models.NaturalPerson;
 import app.domain.models.User;
+import app.domain.services.FindClient;
 import app.domain.services.CreateCompany;
 import app.domain.services.CreateNaturalPerson;
 import app.domain.services.CreateUser;
@@ -31,16 +35,19 @@ public class CommercialEmployeeUseCase {
     private UpdateClient updateClient; 
     @Autowired
     private FindLoan findLoan; 
+    @Autowired
+    private FindClient findClient;
 
 
     public CommercialEmployeeUseCase(   CreateCompany createCompany, CreateNaturalPerson createNaturalPerson, CreateUser createUser,
-                                        RequestLoan requestLoan, UpdateClient updateClient, FindLoan findLoan) {
+                                        RequestLoan requestLoan, UpdateClient updateClient, FindLoan findLoan, FindClient findClient) {
         this.createCompany = createCompany;
         this.createNaturalPerson = createNaturalPerson;
         this.createUser = createUser;
         this.requestLoan = requestLoan;
         this.updateClient = updateClient;
         this.findLoan = findLoan;
+        this.findClient = findClient;
     }
     public void createCompany (Company company) throws BusinessException {
         createCompany.createCompany(company);
@@ -59,5 +66,38 @@ public class CommercialEmployeeUseCase {
     }
     public void findLoan (Long loanId) throws BusinessException {
         findLoan.findById(loanId);
+    }
+
+    public List<Client> getManagedClients(String employeeDocument) throws BusinessException {
+        return findClient.findAll();
+    }
+
+    public String applyForProduct(String employeeDocument, String clientDocument, String productType,
+                                  Map<String, Object> productDetails) throws BusinessException {
+        if (!"LOAN".equalsIgnoreCase(productType)) {
+            throw new BusinessException("Tipo de producto no soportado");
+        }
+
+        Loan loan = new Loan();
+        Object amountRequested = productDetails.get("amountRequested");
+        Object interestRate = productDetails.get("interestRate");
+        Object term = productDetails.get("term");
+
+        if (amountRequested instanceof Number) {
+            loan.setAmountRequested(new java.math.BigDecimal(amountRequested.toString()));
+        }
+        if (interestRate instanceof Number) {
+            loan.setInterestRate(new java.math.BigDecimal(interestRate.toString()));
+        }
+        if (term instanceof Number) {
+            loan.setTerm(((Number) term).intValue());
+        }
+
+        requestLoan.requestLoan(loan, clientDocument);
+        return "Solicitud de producto creada";
+    }
+
+    public List<Loan> trackManagedLoans(String employeeDocument) throws BusinessException {
+        return findLoan.findByClientDocument(employeeDocument);
     }
 }
