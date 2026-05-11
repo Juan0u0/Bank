@@ -196,6 +196,36 @@
       }
     },
     {
+      "name": "Window Employee - Register natural client",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" },
+          { "key": "Authorization", "value": "{{token}}" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{ \"document\": \"{{newClientDocument}}\", \"name\": \"María López\", \"email\": \"maria.lopez@example.com\", \"cellPhone\": \"3125550000\", \"adress\": \"Calle 10 No. 20-30, Bogotá\", \"birthDate\": \"1990-06-21\" }"
+        },
+        "url": { "raw": "{{baseUrl}}/window-employee/clients/natural", "host": ["{{baseUrl}}"], "path": ["window-employee", "clients", "natural"] }
+      }
+    },
+    {
+      "name": "Window Employee - Register company client",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" },
+          { "key": "Authorization", "value": "{{token}}" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{ \"document\": \"{{newClientDocument}}\", \"name\": \"Servicios S.A.S.\", \"companyName\": \"Servicios S.A.S.\", \"taxId\": \"900123456-7\", \"legalRepresentative\": \"Carlos Ruiz\", \"email\": \"contacto@servicios.com\", \"cellPhone\": \"3155550000\", \"adress\": \"Carrera 5 No. 10-20, Bogotá\" }"
+        },
+        "url": { "raw": "{{baseUrl}}/window-employee/clients/company", "host": ["{{baseUrl}}"], "path": ["window-employee", "clients", "company"] }
+      }
+    },
+    {
       "name": "Window Employee - Open savings account",
       "request": {
         "method": "POST",

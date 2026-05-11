@@ -13,6 +13,10 @@ import app.domain.services.CreateUser;
 import app.domain.services.DepositMoney;
 import app.domain.services.FindAccount;
 import app.domain.services.WithdrawMoney;
+import app.domain.services.CreateNaturalPerson;
+import app.domain.services.CreateCompany;
+import app.domain.models.NaturalPerson;
+import app.domain.models.Company;
 
 @Service
 public class WindowEmployeeUseCase {
@@ -27,14 +31,20 @@ public class WindowEmployeeUseCase {
     private WithdrawMoney withdrawMoney;
     @Autowired
     private FindAccount findAccount;
+    @Autowired
+    private CreateNaturalPerson createNaturalPerson;
+    @Autowired
+    private CreateCompany createCompany;
 
     public WindowEmployeeUseCase(   CreateAccount createAccount, CreateUser createUser, DepositMoney depositMoney, WithdrawMoney withdrawMoney,
-                                    FindAccount findAccount) {
+                                    FindAccount findAccount, CreateNaturalPerson createNaturalPerson, CreateCompany createCompany) {
         this.createAccount = createAccount;
         this.createUser = createUser;
         this.depositMoney = depositMoney;
         this.withdrawMoney = withdrawMoney;
         this.findAccount = findAccount;
+        this.createNaturalPerson = createNaturalPerson;
+        this.createCompany = createCompany;
     }
 
     public void registerUser(User user) throws BusinessException {
@@ -56,5 +66,13 @@ public class WindowEmployeeUseCase {
     
     public BankAccount getAccount(String accountNumber) throws BusinessException {
         return findAccount.findByAccountNumber(accountNumber);
+    }
+
+    public void registerNaturalPerson(NaturalPerson naturalPerson) throws BusinessException {
+        createNaturalPerson.createNaturalPerson(naturalPerson);
+    }
+
+    public void registerCompany(Company company) throws BusinessException {
+        createCompany.createCompany(company);
     }
 }

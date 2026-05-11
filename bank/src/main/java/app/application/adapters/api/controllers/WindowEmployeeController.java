@@ -3,6 +3,10 @@ package app.application.adapters.api.controllers;
 import app.application.adapters.api.request.*;
 import app.application.adapters.api.response.ApiResponse;
 import app.application.usecases.WindowEmployeeUseCase;
+import app.application.adapters.api.request.NaturalPersonRequest;
+import app.application.adapters.api.request.CompanyRequest;
+import app.domain.models.NaturalPerson;
+import app.domain.models.Company;
 import app.domain.models.BankAccount;
 import app.domain.models.User;
 import app.domain.enums.sistemRoles.SistemRole;
@@ -61,6 +65,42 @@ public class WindowEmployeeController {
             new ApiResponse<>(true, "Cuenta creada exitosamente", account.getAccountNumber())
         );
     }
+
+        @PostMapping("/clients/natural")
+        public ResponseEntity<ApiResponse<String>> registerNatural(
+            @Valid @RequestBody NaturalPersonRequest request) {
+        NaturalPerson person = new NaturalPerson();
+        person.setDocument(request.getDocument());
+        person.setName(request.getName());
+        person.setEmail(request.getEmail());
+        person.setCellPhone(request.getCellPhone());
+        person.setAdress(request.getAdress());
+        person.setBirthDate(request.getBirthDate());
+
+        windowEmployeeUseCase.registerNaturalPerson(person);
+        return ResponseEntity.status(HttpStatus.CREATED).body(
+            new ApiResponse<>(true, "Cliente natural registrado exitosamente", person.getDocument())
+        );
+        }
+
+        @PostMapping("/clients/company")
+        public ResponseEntity<ApiResponse<String>> registerCompany(
+            @Valid @RequestBody CompanyRequest request) {
+        Company company = new Company();
+        company.setDocument(request.getDocument());
+        company.setName(request.getName());
+        company.setCompanyName(request.getCompanyName());
+        company.setTaxId(request.getTaxId());
+        company.setLegalRepresentative(request.getLegalRepresentative());
+        company.setEmail(request.getEmail());
+        company.setCellPhone(request.getCellPhone());
+        company.setAdress(request.getAdress());
+
+        windowEmployeeUseCase.registerCompany(company);
+        return ResponseEntity.status(HttpStatus.CREATED).body(
+            new ApiResponse<>(true, "Empresa registrada exitosamente", company.getDocument())
+        );
+        }
 
     // ── Consultar saldo ──────────────────────────────────────────────────────
 

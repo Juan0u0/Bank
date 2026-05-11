@@ -26,13 +26,13 @@ public class CreateAccount {
         this.registerOperation = registerOperation;
     }
     
-    public void createAccount(BankAccount account, String clientDocument) throws BusinessException {
+    public void createAccount(BankAccount account, String document) throws BusinessException {
         // Generamos el número único antes de las validaciones
         account.setAccountNumber(generateUniqueAccountNumber());
         
         validateAccountData(account);
         
-        if (!clientPort.existsByDocument(clientDocument)) {
+        if (!clientPort.existsByDocument(document)) {
             throw new BusinessException("El cliente no existe");
         }
         
@@ -49,7 +49,7 @@ public class CreateAccount {
         
         // Registrar apertura de cuenta en bitácora
         registerOperation.registerAccountOpened(
-            clientDocument,
+            document,
             account.getAccountNumber(),
             account.getAccountType().toString(),
             account.getCurrency().toString()
