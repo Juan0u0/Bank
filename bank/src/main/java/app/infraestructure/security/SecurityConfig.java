@@ -92,8 +92,11 @@ public class SecurityConfig {
                         // Administrator endpoints
                         .requestMatchers("/administrator/**").hasRole("ADMINISTRATOR")
 
-                        // Client endpoints
-                        .requestMatchers("/client/**").hasRole("CLIENT")
+                        // Natural Client endpoints
+                        .requestMatchers("/client/**").hasRole("NATURAL_CLIENT")
+
+                        // Company Client endpoints
+                        .requestMatchers("/company-client/**").hasRole("CLIENT_COMPANY")
 
                         // All other requests require authentication
                         .anyRequest().authenticated()

@@ -26,8 +26,12 @@ public class RequestLoan {
     public void requestLoan(Loan loan, String clientDocument) throws BusinessException {
         validateLoanData(loan);
         
+        if (clientDocument == null || clientDocument.trim().isEmpty()) {
+            throw new BusinessException("El documento del cliente es obligatorio");
+        }
+        
         if (!clientPort.existsByDocument(clientDocument)) {
-            throw new BusinessException("El cliente no existe");
+            throw new BusinessException("El cliente con documento/NIT '" + clientDocument + "' no existe");
         }
         
         loan.setLoanStatus(LoanStatus.IN_STUDY);

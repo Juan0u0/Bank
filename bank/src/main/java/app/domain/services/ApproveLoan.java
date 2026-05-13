@@ -1,9 +1,11 @@
 package app.domain.services;
 
 import app.domain.models.Loan;
+import app.domain.models.BankAccount;
 import app.domain.enums.approvalFlows.LoanStatus;
 import app.domain.enums.sistemRoles.SistemRole;
 import app.domain.ports.LoanPort;
+import app.domain.ports.BankAccountPort;
 import app.domain.exceptions.BusinessException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -14,11 +16,13 @@ import java.math.BigDecimal;
 public class ApproveLoan {
     
     private final LoanPort loanPort;
+    private final BankAccountPort accountPort;
     private final RegisterOperation registerOperation;
     
     @Autowired
-    public ApproveLoan(LoanPort loanPort, RegisterOperation registerOperation) {
+    public ApproveLoan(LoanPort loanPort, BankAccountPort accountPort, RegisterOperation registerOperation) {
         this.loanPort = loanPort;
+        this.accountPort = accountPort;
         this.registerOperation = registerOperation;
     }
     
@@ -53,5 +57,47 @@ public class ApproveLoan {
             amountApproved,
             loan.getInterestRate()
         );
+        
+        // ========== DESEMBOLSO AUTOMÁTICO ==========
+        // Buscar cuenta del cliente usando el documento
+        String documentToUse = loan.getClientDocument();
+        if (documentToUse == null || documentToUse.trim().isEmpty()) {
+            // Si no hay clientDocument, intentar obtenerlo del cliente
+            if (loan.getClient() != null && loan.getClient().getDocument() != null) {
+                documentToUse = loan.getClient().getDocument();
+            } else {
+                throw new BusinessException("No se puede desembolsar: no hay información del cliente en el préstamo");
+            }
+        }
+        
+        // Buscar primera cuenta disponible del cliente (no cerrada)
+        BankAccount account = accountPort.findFirstActiveByClientDocument(documentToUse.trim());
+        if (account == null) {
+            throw new BusinessException("El cliente (documento: " + documentToUse + 
+                ") no tiene una cuenta disponible para desembolsar el préstamo. " +
+                "Registre una cuenta bancaria antes de desembolsar el préstamo.");
+        }
+        
+        // Asociar la cuenta al préstamo
+        loan.setBankAccount(account);
+        
+        // Actualizar saldo de la cuenta
+        BigDecimal newBalance = account.getBalance().add(amountApproved);
+        accountPort.updateBalance(account.getAccountNumber(), newBalance);
+        
+        // Actualizar estado del préstamo a DESEMBOLSADO
+        loan.setLoanStatus(LoanStatus.DISBURSED);
+        loan.setDisbursementDate(LocalDateTime.now());
+        
+        loanPort.update(loan);
+        
+        // Registrar operación de desembolso en bitácora (NoSQL)
+        registerOperation.registerLoanDisbursed(
+            loan.getClientDocument(), 
+            loanId, 
+            amountApproved, 
+            account.getAccountNumber()
+        );
     }
 }
+

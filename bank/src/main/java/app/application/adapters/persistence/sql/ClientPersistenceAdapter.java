@@ -26,7 +26,7 @@ public class ClientPersistenceAdapter implements ClientPort {
 
     @Override
     public boolean existsByDocument(String document) {
-        return naturalRepository.existsByDocument(document) || companyRepository.existsByDocument(document);
+        return naturalRepository.existsByDocument(document) || companyRepository.existsByNit(document);
     }
 
     @Override
@@ -47,19 +47,19 @@ public class ClientPersistenceAdapter implements ClientPort {
                 existing.setEmail(client.getEmail());
                 existing.setCellPhone(client.getCellPhone());
                 existing.setAdress(client.getAdress());
-                existing.setBirthDate(((app.domain.models.NaturalPerson) client).getBirthDate());
+                app.domain.models.NaturalPerson person = (app.domain.models.NaturalPerson) client;
+                existing.setBirthDate(person.getBirthDate());
+                existing.setRole(person.getRole() != null ? person.getRole().name() : null);
                 naturalRepository.save(existing);
             }
         } else if (client instanceof app.domain.models.Company) {
-            CompanyClientEntity existing = companyRepository.findByDocument(client.getDocument());
+            CompanyClientEntity existing = companyRepository.findByNit(client.getDocument());
             if (existing != null) {
-                existing.setName(client.getName());
                 existing.setEmail(client.getEmail());
                 existing.setCellPhone(client.getCellPhone());
                 existing.setAdress(client.getAdress());
                 app.domain.models.Company company = (app.domain.models.Company) client;
                 existing.setCompanyName(company.getCompanyName());
-                existing.setTaxId(company.getTaxId());
                 existing.setLegalRepresentative(company.getLegalRepresentative());
                 existing.setRole(company.getRole() != null ? company.getRole().name() : null);
                 companyRepository.save(existing);
@@ -71,14 +71,14 @@ public class ClientPersistenceAdapter implements ClientPort {
     @Transactional
     public void deleteByDocument(String document) {
         naturalRepository.deleteByDocument(document);
-        companyRepository.deleteByDocument(document);
+        companyRepository.deleteByNit(document);
     }
 
     @Override
     public Client findByDocument(String document) {
         NaturalClientEntity natural = naturalRepository.findByDocument(document);
         if (natural != null) return toNaturalModel(natural);
-        CompanyClientEntity company = companyRepository.findByDocument(document);
+        CompanyClientEntity company = companyRepository.findByNit(document);
         if (company != null) return toCompanyModel(company);
         return null;
     }
@@ -97,18 +97,17 @@ public class ClientPersistenceAdapter implements ClientPort {
         entity.setCellPhone(natural.getCellPhone());
         entity.setAdress(natural.getAdress());
         entity.setBirthDate(natural.getBirthDate());
+        entity.setRole(natural.getRole() != null ? natural.getRole().name() : null);
         return entity;
     }
 
     private CompanyClientEntity toCompanyEntity(app.domain.models.Company company) {
         CompanyClientEntity entity = new CompanyClientEntity();
-        entity.setDocument(company.getDocument());
-        entity.setName(company.getName());
+        entity.setNit(company.getDocument());
+        entity.setCompanyName(company.getCompanyName());
         entity.setEmail(company.getEmail());
         entity.setCellPhone(company.getCellPhone());
         entity.setAdress(company.getAdress());
-        entity.setCompanyName(company.getCompanyName());
-        entity.setTaxId(company.getTaxId());
         entity.setLegalRepresentative(company.getLegalRepresentative());
         entity.setRole(company.getRole() != null ? company.getRole().name() : null);
         return entity;
@@ -122,18 +121,18 @@ public class ClientPersistenceAdapter implements ClientPort {
         person.setCellPhone(entity.getCellPhone());
         person.setAdress(entity.getAdress());
         person.setBirthDate(entity.getBirthDate());
+        person.setRole(entity.getRole() != null ? app.domain.enums.sistemRoles.SistemRole.valueOf(entity.getRole()) : null);
         return person;
     }
 
     private app.domain.models.Company toCompanyModel(CompanyClientEntity entity) {
         app.domain.models.Company company = new app.domain.models.Company();
-        company.setDocument(entity.getDocument());
-        company.setName(entity.getName());
+        company.setDocument(entity.getNit());
+        company.setName(entity.getCompanyName());
         company.setEmail(entity.getEmail());
         company.setCellPhone(entity.getCellPhone());
         company.setAdress(entity.getAdress());
         company.setCompanyName(entity.getCompanyName());
-        company.setTaxId(entity.getTaxId());
         company.setLegalRepresentative(entity.getLegalRepresentative());
         company.setRole(entity.getRole() != null ? app.domain.enums.sistemRoles.SistemRole.valueOf(entity.getRole()) : null);
         return company;

@@ -35,6 +35,8 @@ public class CreateAccount {
         if (!clientPort.existsByDocument(document)) {
             throw new BusinessException("El cliente no existe");
         }
+
+        account.setClient(clientPort.findByDocument(document));
         
         // Esta validación se mantiene por seguridad, aunque el generador ya la hace
         if (accountPort.existsByAccountNumber(account.getAccountNumber())) {

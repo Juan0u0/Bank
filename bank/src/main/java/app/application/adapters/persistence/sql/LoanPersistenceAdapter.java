@@ -3,6 +3,7 @@ package app.application.adapters.persistence.sql;
 import app.application.adapters.persistence.sql.entities.LoanEntity;
 import app.application.adapters.persistence.sql.repositories.LoanRepository;
 import app.domain.models.Loan;
+import app.domain.models.BankAccount;
 import app.domain.enums.LoanType;
 import app.domain.enums.approvalFlows.LoanStatus;
 import app.domain.ports.LoanPort;
@@ -89,7 +90,8 @@ public class LoanPersistenceAdapter implements LoanPort {
         LoanEntity entity = new LoanEntity();
         entity.setLoanId(loan.getLoanId());
         entity.setLoanType(loan.getLoanType() != null ? loan.getLoanType().name() : null);
-        entity.setClientDocument(loan.getClient() != null ? loan.getClient().getDocument() : null);
+        entity.setClientDocument(loan.getClientDocument() != null ? loan.getClientDocument() : 
+                                 (loan.getClient() != null ? loan.getClient().getDocument() : null));
         entity.setAmountRequested(loan.getAmountRequested());
         entity.setAmountApproved(loan.getAmountApproved());
         entity.setInterestRate(loan.getInterestRate());
@@ -106,6 +108,7 @@ public class LoanPersistenceAdapter implements LoanPort {
         Loan loan = new Loan();
         loan.setLoanId(entity.getLoanId());
         loan.setLoanType(entity.getLoanType() != null ? LoanType.valueOf(entity.getLoanType()) : null);
+        loan.setClientDocument(entity.getClientDocument());
         loan.setAmountRequested(entity.getAmountRequested());
         loan.setAmountApproved(entity.getAmountApproved());
         loan.setInterestRate(entity.getInterestRate());
@@ -113,6 +116,14 @@ public class LoanPersistenceAdapter implements LoanPort {
         loan.setLoanStatus(entity.getLoanStatus() != null ? LoanStatus.valueOf(entity.getLoanStatus()) : null);
         loan.setApprovalDate(entity.getApprovalDate());
         loan.setDisbursementDate(entity.getDisbursementDate());
+        
+        // Mapear el account_number a BankAccount
+        if (entity.getAccountNumber() != null) {
+            BankAccount account = new BankAccount();
+            account.setAccountNumber(entity.getAccountNumber());
+            loan.setBankAccount(account);
+        }
+        
         return loan;
     }
 }

@@ -20,6 +20,8 @@ public interface BankAccountPort {
     
     List<BankAccount> findByClientDocument(String clientDocument);
     
+    BankAccount findFirstActiveByClientDocument(String clientDocument);
+    
     List<BankAccount> findAll();
     
     void updateBalance(String accountNumber, BigDecimal newBalance);

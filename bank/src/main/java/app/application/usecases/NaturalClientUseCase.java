@@ -16,7 +16,7 @@ import app.domain.services.RequestLoan;
 import java.util.List;
 
 @Service
-public class ClientUseCase {
+public class NaturalClientUseCase {
 
     @Autowired
     private FindAccount findAccount;
@@ -31,7 +31,7 @@ public class ClientUseCase {
     @Autowired
     private FindOperationLog findOperationLog;
 
-    public ClientUseCase(   FindAccount findAccount, FindLoan findLoan, FindTransfer findTransfer, 
+    public NaturalClientUseCase(   FindAccount findAccount, FindLoan findLoan, FindTransfer findTransfer, 
                             RequestLoan requestLoan, CreateTransfer createTransfer, FindOperationLog findOperationLog) {
 
         this.findAccount = findAccount;

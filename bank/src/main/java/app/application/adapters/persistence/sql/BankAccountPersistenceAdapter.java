@@ -69,6 +69,16 @@ public class BankAccountPersistenceAdapter implements BankAccountPort {
     }
 
     @Override
+    public BankAccount findFirstActiveByClientDocument(String clientDocument) {
+        List<BankAccountEntity> accounts = repository.findByClientDocument(clientDocument);
+        return accounts.stream()
+                .filter(acc -> "ACTIVE".equals(acc.getAccountStatus()))
+                .map(this::toModel)
+                .findFirst()
+                .orElse(null);
+    }
+
+    @Override
     public List<BankAccount> findAll() {
         return repository.findAll().stream().map(this::toModel).collect(Collectors.toList());
     }

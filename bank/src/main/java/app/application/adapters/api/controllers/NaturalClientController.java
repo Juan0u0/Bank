@@ -3,7 +3,7 @@ package app.application.adapters.api.controllers;
 import app.application.adapters.api.request.RequestLoanRequest;
 import app.application.adapters.api.request.TransferRequest;
 import app.application.adapters.api.response.ApiResponse;
-import app.application.usecases.ClientUseCase;
+import app.application.usecases.NaturalClientUseCase;
 import app.domain.models.Loan;
 import app.domain.models.Transfer;
 import app.domain.models.BankAccount;
@@ -20,9 +20,9 @@ import java.util.Map;
 @RestController
 @RequestMapping("/client")
 @RequiredArgsConstructor
-public class ClientController {
+public class NaturalClientController {
 
-    private final ClientUseCase clientUseCase;
+    private final NaturalClientUseCase clientUseCase;
     private final JwtUtil jwtUtil;
 
     // ── Ver productos propios (cuentas y préstamos) ───────────────────────────
@@ -50,11 +50,15 @@ public class ClientController {
     public ResponseEntity<ApiResponse<String>> requestLoan(
             @Valid @RequestBody RequestLoanRequest request,
             @RequestHeader("Authorization") String token) {
-        String clientDocument = extractDocumentFromToken(token);
+        // Usar directamente el documento del cliente del request (puede ser NIT o documento)
+        String clientDocument = request.getClientDocument().trim();
+        
         Loan loan = new Loan();
+        loan.setClientDocument(clientDocument);
+        loan.setLoanType(request.getLoanType());
         loan.setAmountRequested(request.getAmountRequested());
         loan.setInterestRate(request.getInterestRate());
-        loan.setTerm(request.getTerm());
+        loan.setTerm(request.getTermMonths());
         
         clientUseCase.RequestLoan(loan, clientDocument);
         return ResponseEntity.status(HttpStatus.CREATED).body(

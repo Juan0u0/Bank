@@ -1,5 +1,6 @@
 package app.application.adapters.api.response;
 
+import app.domain.enums.sistemRoles.SistemRole;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -14,5 +15,5 @@ public class CompanyResponse {
     private String email;
     private String cellPhone;
     private String adress;
-    private String role;
+    private SistemRole role;
 }

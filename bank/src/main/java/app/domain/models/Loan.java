@@ -16,6 +16,7 @@ import lombok.Setter;
 public class Loan {
     private Long loanId;
     private LoanType loanType;
+    private String clientDocument; //Documento del cliente
     private Client client;
     private BigDecimal amountRequested; //Monto solicitado
     private BigDecimal amountApproved; //Monto aprobado
@@ -26,3 +27,4 @@ public class Loan {
     private LocalDateTime disbursementDate; //Fecha de desembolso
     private BankAccount bankAccount; //Cuenta bancaria asociada al préstamo
 }
+

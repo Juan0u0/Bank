@@ -2,9 +2,11 @@ package app.domain.services;
 
 import app.domain.models.User;
 import app.domain.ports.UserPort;
+import app.domain.ports.ClientPort;
 import app.domain.enums.status.UserStatus;
 import app.domain.exceptions.BusinessException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import java.util.regex.Pattern;
 
@@ -12,12 +14,16 @@ import java.util.regex.Pattern;
 public class CreateUser {
     
     private final UserPort userPort;
+    private final ClientPort clientPort;
+    private final PasswordEncoder passwordEncoder;
     private static final String EMAIL_PATTERN = "^[A-Za-z0-9+_.-]+@(.+)$";
     private static final Pattern pattern = Pattern.compile(EMAIL_PATTERN);
     
     @Autowired
-    public CreateUser(UserPort userPort) {
+    public CreateUser(UserPort userPort, ClientPort clientPort, PasswordEncoder passwordEncoder) {
         this.userPort = userPort;
+        this.clientPort = clientPort;
+        this.passwordEncoder = passwordEncoder;
     }
     
     public void createUser(User user) throws BusinessException {
@@ -30,7 +36,14 @@ public class CreateUser {
         if (userPort.existsByUsername(user.getUsername())) {
             throw new BusinessException("Ya existe un usuario con ese nombre de usuario");
         }
+
+        // Validar que el cliente existe en natural_clients o company_clients
+        if (!clientPort.existsByDocument(user.getDocument())) {
+            throw new BusinessException("El cliente no existe. Debe registrar primero al cliente (persona natural o empresa)");
+        }
         
+        // Encriptar la contraseña antes de guardar
+        user.setPassword(passwordEncoder.encode(user.getPassword()));
         user.setStatus(UserStatus.ACTIVE);
         userPort.save(user);
     }

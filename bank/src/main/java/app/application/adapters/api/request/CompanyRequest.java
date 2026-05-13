@@ -11,16 +11,13 @@ import lombok.Setter;
 public class CompanyRequest {
     
     @NotBlank(message = "El documento (NIT) es obligatorio")
-    private String document;
+    private String nit;
 
     @NotBlank(message = "El nombre de la razón social es obligatorio")
     private String name;
 
     @NotBlank(message = "La razón social es obligatoria")
     private String companyName;
-
-    @NotBlank(message = "El NIT es obligatorio")
-    private String taxId;
 
     @NotBlank(message = "El representante legal es obligatorio")
     private String legalRepresentative;
@@ -35,4 +32,6 @@ public class CompanyRequest {
 
     @NotBlank(message = "La dirección es obligatoria")
     private String adress;
+
+    private String role;
 }

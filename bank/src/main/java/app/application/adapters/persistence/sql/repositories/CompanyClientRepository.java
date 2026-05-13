@@ -7,9 +7,10 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface CompanyClientRepository extends JpaRepository<CompanyClientEntity, Long> {
 
-    boolean existsByDocument(String document);
+    boolean existsByNit(String nit);
 
-    CompanyClientEntity findByDocument(String document);
+    CompanyClientEntity findByNit(String nit);
 
-    void deleteByDocument(String document);
+    void deleteByNit(String nit);
 }
+

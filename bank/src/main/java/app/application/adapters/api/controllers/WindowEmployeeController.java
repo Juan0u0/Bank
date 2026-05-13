@@ -1,6 +1,7 @@
 package app.application.adapters.api.controllers;
 
 import app.application.adapters.api.request.*;
+import app.application.adapters.api.response.AccountBalanceStatusResponse;
 import app.application.adapters.api.response.ApiResponse;
 import app.application.usecases.WindowEmployeeUseCase;
 import app.application.adapters.api.request.NaturalPersonRequest;
@@ -76,6 +77,9 @@ public class WindowEmployeeController {
         person.setCellPhone(request.getCellPhone());
         person.setAdress(request.getAdress());
         person.setBirthDate(request.getBirthDate());
+        if (request.getRole() != null) {
+            person.setRole(SistemRole.valueOf(request.getRole().toUpperCase()));
+        }
 
         windowEmployeeUseCase.registerNaturalPerson(person);
         return ResponseEntity.status(HttpStatus.CREATED).body(
@@ -87,14 +91,16 @@ public class WindowEmployeeController {
         public ResponseEntity<ApiResponse<String>> registerCompany(
             @Valid @RequestBody CompanyRequest request) {
         Company company = new Company();
-        company.setDocument(request.getDocument());
+        company.setDocument(request.getNit());
         company.setName(request.getName());
         company.setCompanyName(request.getCompanyName());
-        company.setTaxId(request.getTaxId());
         company.setLegalRepresentative(request.getLegalRepresentative());
         company.setEmail(request.getEmail());
         company.setCellPhone(request.getCellPhone());
         company.setAdress(request.getAdress());
+        if (request.getRole() != null) {
+            company.setRole(SistemRole.valueOf(request.getRole().toUpperCase()));
+        }
 
         windowEmployeeUseCase.registerCompany(company);
         return ResponseEntity.status(HttpStatus.CREATED).body(
@@ -105,11 +111,15 @@ public class WindowEmployeeController {
     // ── Consultar saldo ──────────────────────────────────────────────────────
 
     @GetMapping("/accounts/{id}/balance")
-    public ResponseEntity<ApiResponse<BigDecimal>> getAccountBalance(
+    public ResponseEntity<ApiResponse<AccountBalanceStatusResponse>> getAccountBalance(
             @PathVariable String id,
             @RequestHeader("Authorization") String token) {
         BankAccount account = windowEmployeeUseCase.getAccount(id);
-        return ResponseEntity.ok(new ApiResponse<>(true, "Saldo consultado exitosamente", account.getBalance()));
+        AccountBalanceStatusResponse response = new AccountBalanceStatusResponse(
+            account.getBalance(),
+            account.getAccountStatus() != null ? account.getAccountStatus().name() : "UNKNOWN"
+        );
+        return ResponseEntity.ok(new ApiResponse<>(true, "Consulta de cuenta exitosa", response));
     }
 
     // ── Depósitos y retiros ──────────────────────────────────────────────────
