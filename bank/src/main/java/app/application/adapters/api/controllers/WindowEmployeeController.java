@@ -19,6 +19,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 
 @RestController
 @RequestMapping("/window-employee")
@@ -43,6 +46,11 @@ public class WindowEmployeeController {
         user.setAdress(request.getAdress());
         user.setStatus(UserStatus.ACTIVE);
         user.setRole(SistemRole.valueOf(request.getRole().toUpperCase()));
+        
+        // Mapear birthDate si está presente
+        if (request.getBirthDate() != null && !request.getBirthDate().isBlank()) {
+            user.setBirthDate(LocalDate.parse(request.getBirthDate(), DateTimeFormatter.ISO_LOCAL_DATE));
+        }
         
         windowEmployeeUseCase.registerUser(user);
         return ResponseEntity.status(HttpStatus.CREATED).body(

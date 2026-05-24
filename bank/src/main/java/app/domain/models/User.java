@@ -5,6 +5,7 @@ import app.domain.enums.status.UserStatus;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import java.time.LocalDate;
 
 @Getter
 @Setter
@@ -17,4 +18,5 @@ public class User extends Person {
     private String password;
     private SistemRole role;
     private UserStatus status;
+    private LocalDate birthDate;
 }

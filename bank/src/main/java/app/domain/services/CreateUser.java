@@ -1,11 +1,13 @@
 package app.domain.services;
 
 import app.domain.models.User;
+import app.domain.models.NaturalPerson;
+import app.domain.models.Company;
 import app.domain.ports.UserPort;
 import app.domain.ports.ClientPort;
 import app.domain.enums.status.UserStatus;
+import app.domain.enums.sistemRoles.SistemRole;
 import app.domain.exceptions.BusinessException;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import java.util.regex.Pattern;
@@ -19,7 +21,6 @@ public class CreateUser {
     private static final String EMAIL_PATTERN = "^[A-Za-z0-9+_.-]+@(.+)$";
     private static final Pattern pattern = Pattern.compile(EMAIL_PATTERN);
     
-    @Autowired
     public CreateUser(UserPort userPort, ClientPort clientPort, PasswordEncoder passwordEncoder) {
         this.userPort = userPort;
         this.clientPort = clientPort;
@@ -37,9 +38,30 @@ public class CreateUser {
             throw new BusinessException("Ya existe un usuario con ese nombre de usuario");
         }
 
-        // Validar que el cliente existe en natural_clients o company_clients
-        if (!clientPort.existsByDocument(user.getDocument())) {
-            throw new BusinessException("El cliente no existe. Debe registrar primero al cliente (persona natural o empresa)");
+        // Si el usuario es NATURAL_CLIENT o CLIENT_COMPANY, crear el cliente automáticamente
+        if (user.getRole() == SistemRole.NATURAL_CLIENT) {
+            if (!clientPort.existsByDocument(user.getDocument())) {
+                NaturalPerson naturalClient = new NaturalPerson();
+                naturalClient.setName(user.getName());
+                naturalClient.setDocument(user.getDocument());
+                naturalClient.setEmail(user.getEmail());
+                naturalClient.setCellPhone(user.getCellPhone());
+                naturalClient.setAdress(user.getAdress());
+                naturalClient.setBirthDate(user.getBirthDate());
+                naturalClient.setRole(SistemRole.NATURAL_CLIENT);
+                clientPort.save(naturalClient);
+            }
+        } else if (user.getRole() == SistemRole.CLIENT_COMPANY) {
+            if (!clientPort.existsByDocument(user.getDocument())) {
+                Company company = new Company();
+                company.setName(user.getName());
+                company.setDocument(user.getDocument());
+                company.setEmail(user.getEmail());
+                company.setCellPhone(user.getCellPhone());
+                company.setAdress(user.getAdress());
+                company.setRole(SistemRole.CLIENT_COMPANY);
+                clientPort.save(company);
+            }
         }
         
         // Encriptar la contraseña antes de guardar

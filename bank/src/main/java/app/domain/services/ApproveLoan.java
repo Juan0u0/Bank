@@ -7,7 +7,6 @@ import app.domain.enums.sistemRoles.SistemRole;
 import app.domain.ports.LoanPort;
 import app.domain.ports.BankAccountPort;
 import app.domain.exceptions.BusinessException;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import java.time.LocalDateTime;
 import java.math.BigDecimal;
@@ -19,7 +18,6 @@ public class ApproveLoan {
     private final BankAccountPort accountPort;
     private final RegisterOperation registerOperation;
     
-    @Autowired
     public ApproveLoan(LoanPort loanPort, BankAccountPort accountPort, RegisterOperation registerOperation) {
         this.loanPort = loanPort;
         this.accountPort = accountPort;
@@ -44,6 +42,28 @@ public class ApproveLoan {
             throw new BusinessException("El monto aprobado debe ser mayor a cero y no mayor al solicitado");
         }
         
+        // ========== VALIDAR QUE EL CLIENTE TIENE CUENTA ANTES DE APROBAR ==========
+        // Buscar cuenta del cliente usando el documento
+        String documentToUse = loan.getClientDocument();
+        if (documentToUse == null || documentToUse.trim().isEmpty()) {
+            // Si no hay clientDocument, intentar obtenerlo del cliente
+            if (loan.getClient() != null && loan.getClient().getDocument() != null) {
+                documentToUse = loan.getClient().getDocument();
+            } else {
+                throw new BusinessException("No se puede aprobar: no hay información del cliente en el préstamo");
+            }
+        }
+        
+        // Buscar primera cuenta disponible del cliente (no cerrada)
+        BankAccount account = accountPort.findFirstActiveByClientDocument(documentToUse.trim());
+        if (account == null) {
+            throw new BusinessException("El préstamo no puede ser aprobado porque el cliente (documento: " + documentToUse + 
+                ") no tiene una cuenta bancaria disponible. " +
+                "El cliente debe registrar una cuenta bancaria antes de aprobar el préstamo. " +
+                "El estado del préstamo permanecerá en 'En estudio'.");
+        }
+        
+        // ========== APROBAR PRÉSTAMO ==========
         loan.setAmountApproved(amountApproved);
         loan.setLoanStatus(LoanStatus.APPROVED);
         loan.setApprovalDate(LocalDateTime.now());
@@ -59,24 +79,6 @@ public class ApproveLoan {
         );
         
         // ========== DESEMBOLSO AUTOMÁTICO ==========
-        // Buscar cuenta del cliente usando el documento
-        String documentToUse = loan.getClientDocument();
-        if (documentToUse == null || documentToUse.trim().isEmpty()) {
-            // Si no hay clientDocument, intentar obtenerlo del cliente
-            if (loan.getClient() != null && loan.getClient().getDocument() != null) {
-                documentToUse = loan.getClient().getDocument();
-            } else {
-                throw new BusinessException("No se puede desembolsar: no hay información del cliente en el préstamo");
-            }
-        }
-        
-        // Buscar primera cuenta disponible del cliente (no cerrada)
-        BankAccount account = accountPort.findFirstActiveByClientDocument(documentToUse.trim());
-        if (account == null) {
-            throw new BusinessException("El cliente (documento: " + documentToUse + 
-                ") no tiene una cuenta disponible para desembolsar el préstamo. " +
-                "Registre una cuenta bancaria antes de desembolsar el préstamo.");
-        }
         
         // Asociar la cuenta al préstamo
         loan.setBankAccount(account);
