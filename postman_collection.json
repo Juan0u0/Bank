@@ -1,0 +1,132 @@
+{
+  "info": {
+    "name": "Bank API - Collection",
+    "_postman_id": "bank-api-collection",
+    "description": "Colección para evaluar controladores de la aplicación (localhost:8083)",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    { "key": "baseUrl", "value": "http://localhost:8083" },
+    { "key": "token", "value": "" }
+  ],
+  "item": [
+    {
+      "name": "Auth - Login (obtener token)",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{ \"username\": \"ADMINISTRATOR\", \"password\": \"123\" }"
+        },
+        "url": { "raw": "{{baseUrl}}/auth/login", "host": ["{{baseUrl}}"], "path": ["auth","login"] }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "var json = pm.response.json();",
+              "if(json && json.token){ pm.environment.set('token', 'Bearer ' + json.token); }",
+              "pm.test('token saved', function(){ pm.expect(pm.environment.get('token')).to.exist; });"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Administrator - Create bank product",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" },
+          { "key": "Authorization", "value": "{{token}}" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{ \"productName\": \"Cuenta Ahorro Plus\", \"category\": \"SAVINGS\", \"status\": \"APPROVED\" }"
+        },
+        "url": { "raw": "{{baseUrl}}/administrator/bank-products", "host": ["{{baseUrl}}"], "path": ["administrator","bank-products"] }
+      }
+    },
+    {
+      "name": "Window Employee - Create account",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" },
+          { "key": "Authorization", "value": "{{token}}" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{ \"accountType\": \"SAVINGS\", \"balance\": 1000, \"currency\": \"USD\", \"clientDocument\": \"CLIENT_DOC\" }"
+        },
+        "url": { "raw": "{{baseUrl}}/window-employee/accounts", "host": ["{{baseUrl}}"], "path": ["window-employee","accounts"] }
+      }
+    },
+    {
+      "name": "Commercial Employee - Create user",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" },
+          { "key": "Authorization", "value": "{{token}}" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{ \"document\": \"EMP_DOC_1\", \"name\": \"Empleado Comercial\", \"username\": \"COMMERCIAL_EMPLOYEE\", \"password\": \"123\", \"role\": \"COMMERCIAL_EMPLOYEE\", \"email\": \"comm@example.com\", \"cellPhone\": \"3001234567\", \"adress\": \"Calle 1\" }"
+        },
+        "url": { "raw": "{{baseUrl}}/commercial-employee/users", "host": ["{{baseUrl}}"], "path": ["commercial-employee","users"] }
+      }
+    },
+    {
+      "name": "Company Employee - Create transfer",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" },
+          { "key": "Authorization", "value": "{{token}}" }
+        ],
+        "body": { "mode": "raw", "raw": "{ \"originAccountNumber\": \"ACC123\", \"destinationAccountNumber\": \"ACC456\", \"amount\": 50 }" },
+        "url": { "raw": "{{baseUrl}}/company-employee/transfers", "host": ["{{baseUrl}}"], "path": ["company-employee","transfers"] }
+      }
+    },
+    {
+      "name": "Company Supervisor - Approve transfer",
+      "request": {
+        "method": "POST",
+        "header": [ { "key": "Authorization", "value": "{{token}}" } ],
+        "url": { "raw": "{{baseUrl}}/company-supervisor/transfers/1/approve", "host": ["{{baseUrl}}"], "path": ["company-supervisor","transfers","1","approve"] }
+      }
+    },
+    {
+      "name": "Internal Analyst - Approve loan",
+      "request": {
+        "method": "POST",
+        "header": [ { "key": "Content-Type", "value": "application/json" }, { "key": "Authorization", "value": "{{token}}" } ],
+        "body": { "mode": "raw", "raw": "{ \"amountApproved\": 500 }" },
+        "url": { "raw": "{{baseUrl}}/internal-analyst/loans/1/approve", "host": ["{{baseUrl}}"], "path": ["internal-analyst","loans","1","approve"] }
+      }
+    },
+    {
+      "name": "Client - Request loan",
+      "request": {
+        "method": "POST",
+        "header": [ { "key": "Content-Type", "value": "application/json" }, { "key": "Authorization", "value": "{{token}}" } ],
+        "body": { "mode": "raw", "raw": "{ \"loanType\": \"PERSONAL\", \"amountRequested\": 1000, \"interestRate\": 5, \"term\": 12 }" },
+        "url": { "raw": "{{baseUrl}}/client/loans/request", "host": ["{{baseUrl}}"], "path": ["client","loans","request"] }
+      }
+    },
+    {
+      "name": "Client - Create transfer",
+      "request": {
+        "method": "POST",
+        "header": [ { "key": "Content-Type", "value": "application/json" }, { "key": "Authorization", "value": "{{token}}" } ],
+        "body": { "mode": "raw", "raw": "{ \"originAccountNumber\": \"ACC123\", \"destinationAccountNumber\": \"ACC456\", \"amount\": 25 }" },
+        "url": { "raw": "{{baseUrl}}/client/transfers", "host": ["{{baseUrl}}"], "path": ["client","transfers"] }
+      }
+    }
+  ]
+}

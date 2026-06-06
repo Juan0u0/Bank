@@ -1,0 +1,22 @@
+package app.domain.models;
+
+import app.domain.enums.sistemRoles.SistemRole;
+import app.domain.enums.status.UserStatus;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import java.time.LocalDate;
+
+@Getter
+@Setter
+@NoArgsConstructor
+
+public class User extends Person {
+    
+    private Long userId;
+    private String username;
+    private String password;
+    private SistemRole role;
+    private UserStatus status;
+    private LocalDate birthDate;
+}
